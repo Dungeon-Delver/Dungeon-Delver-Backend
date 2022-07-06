@@ -33,7 +33,6 @@ class User {
           console.log(
             `Success! User ${loggedInUser.get('username')} has successfully signed in!`,
           );
-          // Update state variable holding current user
           return true;
         } catch (error) {
           // Error can be caused by wrong parameters or lack of Internet connection
