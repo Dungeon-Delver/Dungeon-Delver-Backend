@@ -6,7 +6,6 @@ const { NotFoundError } = require("../utils/errors")
 router.post("/", async (req, res, next) => {
   try {
     const userData = req.body.userData
-    console.log('userData: ', userData);
     const newUser = await User.handleFacebookLogin(userData)
     res.status(201).json({ newUser: newUser })
   } catch (err) {
