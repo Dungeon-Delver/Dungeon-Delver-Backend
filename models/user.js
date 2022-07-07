@@ -7,9 +7,13 @@ Parse.serverURL = 'https://parseapi.back4app.com';
 class User {
   static async handleFacebookLogin(response) {
     // Check if response has an error
+    if(!response.hasOwnProperty("userData")) {
+      throw new BadRequestError("No UserData");
+    }
+    response = response.userData;
     if (response.error !== undefined) {
       console.log(`Error: ${response.error}`);
-      return false;
+      throw new BadRequestError();
     } else {
       try {
         // Gather Facebook user info
@@ -41,7 +45,7 @@ class User {
         }
       } catch (error) {
         console.error("Error gathering Facebook user info, please try again!", error)
-        return false;
+        throw new BadRequestError();
       }
     }
   }
