@@ -1,7 +1,8 @@
 const { BadRequestError } = require("../utils/errors")
+const Keys = require("../keys.json")
 
 const Parse = require("parse/node");
-Parse.initialize("IvTGkq3kv3I80nw5fzWt27UAKejyHrsvaECfTnDl", "jiBr1kosmfAh19kpj6pDOSvJBz6G8WCqFy5KmNrk")
+Parse.initialize(Keys.parse.appId, Keys.parse.javascriptKey)
 Parse.serverURL = 'https://parseapi.back4app.com';
 
 class User {
