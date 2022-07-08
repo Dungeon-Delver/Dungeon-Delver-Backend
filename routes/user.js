@@ -16,7 +16,7 @@ router.post("/", async (req, res, next) => {
 router.get("/users/:userId/party", async (req, res, next) => {
     try {
         const userId = req.params.userId
-        //const parties = await Party.listParties(userId)
+        const parties = await Party.listParties(userId)
         res.status(200).json({ parties })
     }
     catch(err) {

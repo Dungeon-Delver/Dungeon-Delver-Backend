@@ -25,10 +25,9 @@ class User {
         // Create a new Parse.User object
         const userToLogin = new Parse.User();
         // Set username and email to match facebook profile email
-        userToLogin.set('username', userEmail);
+        userToLogin.set('username', response.name);
         userToLogin.set('email', userEmail);
-        userToLogin.set('name', response.name);
-        userToLogin.set('picture', response.picture.data.url);
+        userToLogin.set('picture', response.picture.data.url);        
         try {
           let loggedInUser = await userToLogin
           .linkWith('facebook', {
@@ -38,7 +37,7 @@ class User {
           console.log(
             `Success! User ${loggedInUser.get('username')} has successfully signed in!`,
           );
-          return true;
+          return loggedInUser.id;
         } catch (error) {
           // Error can be caused by wrong parameters or lack of Internet connection
           console.error(`Error! ${error.message}`);
