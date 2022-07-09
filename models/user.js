@@ -34,9 +34,7 @@ class User {
             authData: {id: userId, access_token: userAccessToken},
           });
           // logIn returns the corresponding ParseUser object
-          console.log(
-            `Success! User ${loggedInUser.get('username')} has successfully signed in!`,
-          );
+          console.log(`Success! User ${loggedInUser.get('username')} has successfully signed in!`);
           return loggedInUser.id;
         } catch (error) {
           // Error can be caused by wrong parameters or lack of Internet connection
