@@ -9,16 +9,7 @@ class Party {
   static async handleCreateParty(body) {
     console.log(body);
     try{
-      const Users = Parse.Object.extend("User");
-      const users = new Parse.Query(Users);
-
-      try {
-        const dm = await users.get(body.dm);
-        console.log(dm)
-      }
-      catch(error) {
-        console.error(error)
-      }
+      
     }
     catch (error) {
       console.log(error);
