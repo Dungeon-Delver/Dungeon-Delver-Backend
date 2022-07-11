@@ -1,9 +1,7 @@
 const express = require("express")
 const router = express.Router()
 const Party = require("../models/party")
-const { NotFoundError } = require("../utils/errors")
-
-
+const { NotFoundError, BadRequestError } = require("../utils/errors")
 
 router.get("/:page", async (req, res, next) => {
     try {
@@ -20,6 +18,9 @@ router.post("/create-party", async (req, res, next) => {
     try {
         const body = req.body;
         const newParty = await Party.handleCreateParty(body)
+        if(newParty == null) {
+            throw new Error("Internal Server Error")
+        }
         res.status(201).json({ newParty })
     }
     catch(err) {
