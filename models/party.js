@@ -7,7 +7,6 @@ Parse.serverURL = 'https://parseapi.back4app.com';
 
 class Party {
   static async handleCreateParty(body) {
-    console.log('body: ', body);
     const bodyProps = ["name", "dm", "searchParameters", "mode"]
     bodyProps.forEach((item) => {
       if(!body.hasOwnProperty(item)) {
