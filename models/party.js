@@ -42,6 +42,13 @@ class Party {
     }
   }
 
+  static async getParty(partyId) {
+      const query = new Parse.Query("Party")
+      const party = await query.get(partyId)
+      console.log('party: ', party);
+      return party;
+  }
+
 }
 
 module.exports = Party

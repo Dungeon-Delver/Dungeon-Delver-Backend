@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const morgan = require('morgan')
 const cors = require("cors")
+const errors = require("./utils/errors")
 
 const userRouter = require("./routes/user.js")
 const partyRouter = require("./routes/party.js")
