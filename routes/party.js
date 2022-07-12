@@ -18,7 +18,6 @@ router.post("/create-party", async (req, res, next) => {
 })
 
 router.get("/:partyId", async (req, res, next) => {
-    console.log("hi")
     try {
         const partyId = req.params.partyId
         const party = await Party.getParty(partyId)

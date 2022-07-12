@@ -22,14 +22,13 @@ class Party {
     })
     const newParty = new Parse.Object("Party");
     newParty.set("name", body.name)
-    try {
-      const query = new Parse.Query("User");
-      const dm = await query.get(body.dm.objectId);
-      newParty.set("dm", dm)
+    const query = new Parse.Query("User");
+    const dm = await query.get(body.dm.objectId);
+    if(!dm.get("enabled")) {
+      console.log("disabled user")
+      throw new BadRequestError("Attempting to create party for disabled user")
     }
-    catch (error) {
-      console.log(error);
-    }
+    newParty.set("dm", dm)
     newParty.set("searchParameters", body.searchParameters)
     newParty.set("status", body.mode)
     try{
