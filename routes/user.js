@@ -14,10 +14,10 @@ router.post("/", async (req, res, next) => {
   }
 })
 
-router.get("/:userId/party", async (req, res, next) => {
+router.get("/:userId/parties", async (req, res, next) => {
     try {
       const userId = req.params.userId
-      const parties = await Party.listParties(userId)
+      const parties = await User.listParties(userId)
       res.status(200).json({ parties })
     }
     catch(err) {
