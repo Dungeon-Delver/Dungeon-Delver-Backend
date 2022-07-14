@@ -30,14 +30,8 @@ class Party {
     newParty.set("dm", dm)
     newParty.set("searchParameters", body.searchParameters)
     newParty.set("status", body.mode)
-    try{
-      let result = await newParty.save()
-      return result.id;
-    }
-    catch (error) {
-      console.log(error)
-      return null; 
-    }
+    let result = await newParty.save()
+    return result.id;
   }
 
   static async getParty(partyId) {
