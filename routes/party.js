@@ -28,4 +28,16 @@ router.get("/:partyId", async (req, res, next) => {
     }
 })
 
+router.get("/:partyId/requested", async (req, res, next) => {
+    try {
+        const partyId = req.params.partyId;
+        const users = await Party.getRequestedUsers(partyId);
+        res.status(200).json({users})
+    }
+    catch(err) {
+        console.log(err)
+        next(err)
+    }
+})
+
 module.exports=router;

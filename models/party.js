@@ -42,6 +42,13 @@ class Party {
       return party;
   }
 
+  static async getRequestedUsers(partyId) {
+    const query = new Parse.Query("Party")
+    const party = await query.get(partyId)
+    const users = await party.get("playersRequested").query().find()
+    return users;
+  }
+
 }
 
 module.exports = Party
