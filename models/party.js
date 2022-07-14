@@ -20,7 +20,7 @@ class Party {
     newParty.set("name", body.name)
     const query = new Parse.Query("User");
     const dm = await query.get(body.dm.objectId);
-    if(!dm.get("enabled")) {
+    if(!dm.get("enabled")&&dm.get("numParties") < 100) {
       console.log("disabled user")
       throw new BadRequestError("Attempting to create party for disabled user")
     }
