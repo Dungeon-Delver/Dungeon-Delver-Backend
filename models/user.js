@@ -10,6 +10,11 @@ class User {
     return parties;
     //Also check for parties we are a player in
   }
+
+  static async requestPartyJoin(userId, party) {
+    console.log('party: ', party);
+    console.log('userId: ', userId);
+  }
 }
 
 module.exports = User

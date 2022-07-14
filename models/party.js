@@ -20,9 +20,12 @@ class Party {
     newParty.set("name", body.name)
     const query = new Parse.Query("User");
     const dm = await query.get(body.dm.objectId);
-    if(!dm.get("enabled")&&dm.get("numParties") < 100) {
+    if(!dm.get("enabled")) {
       console.log("disabled user")
       throw new BadRequestError("Attempting to create party for disabled user")
+    }
+    if(dm.get("numParties") >= 100) {
+      throw new BadRequestError("You have reached the maximum limit for parties")
     }
     dm.increment("numParties", 1);
     await dm.save({}, {useMasterKey: true});

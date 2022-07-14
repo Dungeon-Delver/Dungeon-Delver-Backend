@@ -25,6 +25,17 @@ router.get("/:userId/parties", async (req, res, next) => {
     }
 })
 
+router.post("/:partyId/join", async (req, res, next) => {
+  try {
+    const userId = req.params.userId
+    const party = req.body;
+    const result = await User.requestPartyJoin(userId, party)
+  }
+  catch(err) {
+    next(err)
+  }
+})
+
 router.post("/:userId/disable", async (req, res, next) => {
   try {
     const userId = req.params.userId
