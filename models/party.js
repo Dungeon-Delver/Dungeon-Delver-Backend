@@ -1,9 +1,6 @@
 const { BadRequestError } = require("../utils/errors")
-const Keys = require("../keys.json")
 
-const Parse = require("parse/node");
-Parse.initialize(Keys.parse.appId, Keys.parse.javascriptKey)
-Parse.serverURL = 'https://parseapi.back4app.com';
+const Parse = require("../utils/initializeParse")
 
 class Party {
   static async handleCreateParty(body) {
@@ -27,6 +24,8 @@ class Party {
       console.log("disabled user")
       throw new BadRequestError("Attempting to create party for disabled user")
     }
+    dm.increment("numParties", 1);
+    await dm.save({}, {useMasterKey: true});
     newParty.set("dm", dm)
     newParty.set("searchParameters", body.searchParameters)
     newParty.set("status", body.mode)
