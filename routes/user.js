@@ -21,17 +21,20 @@ router.get("/:userId/parties", async (req, res, next) => {
       res.status(200).json({ parties })
     }
     catch(err) {
+      console.log(err)
       next(err)
     }
 })
 
 router.post("/:partyId/join", async (req, res, next) => {
   try {
-    const userId = req.params.userId
-    const party = req.body;
-    const result = await User.requestPartyJoin(userId, party)
+    const userId = req.body.userId.objectId
+    const partyId = req.params.partyId;
+    await User.requestPartyJoin(userId, partyId)
+    res.status(201).json({})
   }
   catch(err) {
+    console.log(err)
     next(err)
   }
 })

@@ -11,9 +11,25 @@ class User {
     //Also check for parties we are a player in
   }
 
-  static async requestPartyJoin(userId, party) {
-    console.log('party: ', party);
-    console.log('userId: ', userId);
+  static async requestPartyJoin(userId, partyId) {
+    const Parties = Parse.Object.extend("Party")
+    const partyQuery = new Parse.Query(Parties)
+    const party = await partyQuery.get(partyId)
+
+    const playerQuery = new Parse.Query("User")
+    const player = await playerQuery.get(userId)
+
+    const notification = new Parse.Object("Notification");
+    const dm = party.get("dm")
+    notification.set("user", dm)
+    notification.set("type", "joinRequest")
+    notification.set("sourceUser", player)
+    notification.save();
+
+    let playersRequestedRelation = party.relation('playersRequested')
+    playersRequestedRelation.add(player)
+    party.save()
+
   }
 }
 
