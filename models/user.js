@@ -5,10 +5,16 @@ const Parse = require("../utils/initializeParse")
 class User {
   static async listParties(userId) {
     const Parties = Parse.Object.extend("Party");
-    const query = new Parse.Query(Parties);
-    const parties = await query.equalTo("dm", { '__type': 'Pointer', 'className': '_User', 'objectId': userId }).find();
-    return parties;
-    //Also check for parties we are a player in
+    const dmQuery = new Parse.Query(Parties);
+    const dmParties = await dmQuery.equalTo("dm", { '__type': 'Pointer', 'className': '_User', 'objectId': userId }).find();
+    
+    const playerQuery = new Parse.Query(Parties);
+    const userQuery = new Parse.Query("User")
+    const user = await userQuery.get(userId)
+
+    const playerParties = await playerQuery.equalTo("players", user).find()
+    
+    return {dmParties: dmParties, playerParties: playerParties};
   }
 
   static async requestPartyJoin(userId, partyId) {
