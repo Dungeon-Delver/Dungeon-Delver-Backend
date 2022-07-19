@@ -98,7 +98,7 @@ router.post("/:partyId/modify", async (req, res, next) => {
     try {
         const body = req.body;
         const partyId = req.params.partyId
-        const party = await Party.handleCreateParty(partyId, body)
+        const party = await Party.handleModifyParty(partyId, body)
         if(party == null) {
             throw new Error("Internal Server Error")
         }
