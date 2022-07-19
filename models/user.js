@@ -52,6 +52,10 @@ class User {
     party.save()
 
   }
+
+  static async partyLeave() {
+    return;
+  }
 }
 
 module.exports = User
