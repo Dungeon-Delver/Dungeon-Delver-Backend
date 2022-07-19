@@ -110,6 +110,17 @@ class Party {
     return partyPlayers;    
   }
 
+  static async deleteParty(partyId, dm) {
+    const partyQuery = new Parse.Query("Party")
+    const party = await partyQuery.get(partyId)
+    const partyDm = party.get("dm")
+    if(partyDm.id!=dm.objectId) {
+      throw new BadRequestError("Only the Dungeon Master can delete parties")
+    }
+
+    party.destroy();
+  }
+
 }
 
 module.exports = Party
