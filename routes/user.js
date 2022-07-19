@@ -81,7 +81,7 @@ router.post("/:partyId/remove/:userId", async (req, res, next) => {
     const dm = req.body.userId.objectId
     const userId = req.params.userId
     const partyId = req.params.partyId;
-    await User.partyLeave(dm, userId, partyId)
+    await User.partyRemove(dm, userId, partyId)
     res.status(201).json({})
   }
   catch(err) {
