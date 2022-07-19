@@ -53,8 +53,24 @@ class User {
 
   }
 
-  static async partyLeave() {
-    return;
+  static async partyLeave(userId, partyId) {
+    const Parties = Parse.Object.extend("Party")
+    const partyQuery = new Parse.Query(Parties)
+    const party = await partyQuery.get(partyId)
+
+    const playerQuery = new Parse.Query("User")
+    const player = await playerQuery.get(userId)
+
+    const notification = new Parse.Object("Notification");
+    const dm = party.get("dm")
+    notification.set("user", dm)
+    notification.set("type", "leave")
+    notification.set("sourceUser", player)
+    notification.save();
+
+    let playersRelation = party.relation('players')
+    playersRelation.remove(player)
+    party.save()
   }
 }
 
