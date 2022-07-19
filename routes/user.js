@@ -52,6 +52,19 @@ router.post("/:partyId/leave", async (req, res, next) => {
   }
 })
 
+router.post("/:partyId/cancel-join", async (req, res, next) => {
+  try {
+    const userId = req.body.userId.objectId
+    const partyId = req.params.partyId;
+    await User.cancelJoin(userId, partyId)
+    res.status(201).json({})
+  }
+  catch(err) {
+    console.log(err)
+    next(err)
+  }
+})
+
 router.post("/:userId/disable", async (req, res, next) => {
   try {
     const userId = req.params.userId
