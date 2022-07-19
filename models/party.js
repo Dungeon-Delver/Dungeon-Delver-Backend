@@ -1,9 +1,6 @@
 const { BadRequestError } = require("../utils/errors")
-const Keys = require("../keys.json")
 
-const Parse = require("parse/node");
-Parse.initialize(Keys.parse.appId, Keys.parse.javascriptKey)
-Parse.serverURL = 'https://parseapi.back4app.com';
+const Parse = require("../utils/initializeParse")
 
 class Party {
   static async handleCreateParty(body) {
@@ -27,6 +24,11 @@ class Party {
       console.log("disabled user")
       throw new BadRequestError("Attempting to create party for disabled user")
     }
+    if(dm.get("numParties") >= 100) {
+      throw new BadRequestError("You have reached the maximum limit for parties")
+    }
+    dm.increment("numParties", 1);
+    await dm.save({}, {useMasterKey: true});
     newParty.set("dm", dm)
     newParty.set("searchParameters", body.searchParameters)
     newParty.set("status", body.mode)
@@ -37,7 +39,75 @@ class Party {
   static async getParty(partyId) {
       const query = new Parse.Query("Party")
       const party = await query.get(partyId)
-      return party;
+
+      const requestedUsers = await this.getRequestedUsers(partyId)
+      const members = await this.getMembers(partyId)
+
+      return {party: party, requestedUsers: requestedUsers, members: members};
+  }
+
+  static async getRequestedUsers(partyId) {
+    const query = new Parse.Query("Party")
+    const party = await query.get(partyId)
+    const users = await party.get("playersRequested").query().find()
+    return users;
+  }
+
+  static async getMembers(partyId) {
+    const query = new Parse.Query("Party")
+    const party = await query.get(partyId)
+    const dmObj = await party.get("dm")
+    const dmId = dmObj.id
+    const dmQuery = new Parse.Query("User")
+    const dm = await dmQuery.get(dmId)
+    const players = await party.get("players").query().find()
+    return {dm: dm, players: players};
+  }
+
+  static async acceptUser(partyId, userId, dm) {
+    const partyQuery = new Parse.Query("Party")
+    const party = await partyQuery.get(partyId)
+    const partyDm = party.get("dm")
+    if(partyDm.id!=dm.objectId) {
+      throw new BadRequestError("Only the Dungeon Master can accept users")
+    }
+
+    const playerQuery = new Parse.Query("User")
+    const player = await playerQuery.get(userId)
+
+    const requestedUsers = party.get("playersRequested");
+    requestedUsers.remove(player)
+
+    if(player.get("numParties") >= 100) {
+      throw new BadRequestError("This player has reached the maximum limit for parties")
+    }
+
+    player.increment("numParties", 1);
+    await player.save({}, {useMasterKey: true});
+    
+    const players = party.get("players")
+    players.add(player);
+
+    const partyPlayers = await party.save();
+    return partyPlayers;
+  }
+
+  static async rejectUser(partyId, userId, dm) {
+    const partyQuery = new Parse.Query("Party")
+    const party = await partyQuery.get(partyId)
+    const partyDm = party.get("dm")
+    if(partyDm.id!=dm.objectId) {
+      throw new BadRequestError("Only the Dungeon Master can accept users")
+    }
+
+    const playerQuery = new Parse.Query("User")
+    const player = await playerQuery.get(userId)
+
+    const requestedUsers = party.get("playersRequested");
+    requestedUsers.remove(player)
+
+    const partyPlayers = await party.save();
+    return partyPlayers;    
   }
 
 }

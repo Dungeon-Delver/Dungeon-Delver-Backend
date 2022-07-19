@@ -28,4 +28,56 @@ router.get("/:partyId", async (req, res, next) => {
     }
 })
 
+router.get("/:partyId/requested", async (req, res, next) => {
+    try {
+        const partyId = req.params.partyId;
+        const users = await Party.getRequestedUsers(partyId);
+        res.status(200).json({users})
+    }
+    catch(err) {
+        console.log(err)
+        next(err)
+    }
+})
+
+router.get("/:partyId/members", async (req, res, next) => {
+    try {
+        const partyId = req.params.partyId;
+        const result = await Party.getMembers(partyId);
+        res.status(200).json({result})
+    }
+    catch(err) {
+        console.log(err)
+        next(err)
+    }
+})
+
+router.post("/:partyId/accept/:userId", async (req, res, next) => {
+    try {
+        const partyId = req.params.partyId;
+        const userId = req.params.userId
+        const dm = req.body.dm
+        const users = await Party.acceptUser(partyId, userId, dm);
+        res.status(201).json({users})
+    }
+    catch(err) {
+        console.log(err)
+        next(err)
+    }
+})
+
+router.post("/:partyId/reject/:userId", async (req, res, next) => {
+    try {
+        const partyId = req.params.partyId;
+        const userId = req.params.userId
+        const dm = req.body.dm
+        const users = await Party.rejectUser(partyId, userId, dm);
+        res.status(201).json({users})
+    }
+    catch(err) {
+        console.log(err)
+        next(err)
+    }
+})
+
 module.exports=router;

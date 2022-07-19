@@ -1,5 +1,3 @@
-const Parse = require("parse/node");
-
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
@@ -16,9 +14,6 @@ app.use(morgan('tiny')) //used for logging
 
 app.use("/user", userRouter)
 app.use("/party", partyRouter)
-
-Parse.initialize("IvTGkq3kv3I80nw5fzWt27UAKejyHrsvaECfTnDl", "jiBr1kosmfAh19kpj6pDOSvJBz6G8WCqFy5KmNrk")
-Parse.serverURL = 'https://parseapi.back4app.com';
 
 app.get('/', (req, res) => {
   res.send({"ping": "pong"})
