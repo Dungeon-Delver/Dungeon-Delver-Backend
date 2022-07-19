@@ -102,9 +102,10 @@ router.post("/:partyId/modify", async (req, res, next) => {
         if(party == null) {
             throw new Error("Internal Server Error")
         }
-        res.status(201)
+        res.status(201).json({})
     }
     catch(err) {
+        console.log(err)
         next(err)
     }
 })

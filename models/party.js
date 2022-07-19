@@ -110,6 +110,39 @@ class Party {
     return partyPlayers;    
   }
 
+  static async handleModifyParty(partyId, body) {
+    const bodyProps = ["name", "dm", "searchParameters", "mode"]
+    bodyProps.forEach((item) => {
+      if(!body.hasOwnProperty(item)) {
+        throw new BadRequestError("Missing Properties")
+      }
+    })
+    const searchProps = ["experience", "type", "genre", "level"]
+    searchProps.forEach((item) => {
+      if(!body.searchParameters.hasOwnProperty(item)) {
+        throw new BadRequestError("Missing Search Parameters")
+      }
+    })
+    
+    const partyQuery = new Parse.Query("Party")
+    const party = await partyQuery.get(partyId)
+
+    party.set("name", body.name)
+    const userQuery = new Parse.Query("User");
+    const dm = await userQuery.get(body.dm);
+    if(!dm.get("enabled")) {
+      console.log("disabled user")
+      throw new BadRequestError("Attempting to modify party for disabled user")
+    }
+    if(dm.objectId !== party.dm) {
+      throw new BadRequestError("Only the DM can modify party settings")
+    }
+    party.set("searchParameters", body.searchParameters)
+    party.set("status", body.mode)
+    let result = await party.save()
+    return result.id;
+  }
+
   static async deleteParty(partyId, dm) {
     const partyQuery = new Parse.Query("Party")
     const party = await partyQuery.get(partyId)
