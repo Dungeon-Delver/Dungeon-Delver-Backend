@@ -68,6 +68,9 @@ class User {
     notification.set("sourceUser", player)
     notification.save();
 
+    player.decrement("numParties", 1);
+    await player.save({}, {useMasterKey: true});
+
     let playersRelation = party.relation('players')
     playersRelation.remove(player)
     party.save()

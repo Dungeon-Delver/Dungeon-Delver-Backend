@@ -80,4 +80,16 @@ router.post("/:partyId/reject/:userId", async (req, res, next) => {
     }
 })
 
+router.post("/:partyId/delete", async (req, res, next) => {
+    try {
+        const partyId = req.params.partyId;
+        const dm = req.body.dm
+        await Party.deleteParty(partyId, dm)
+        res.status(201).json({})
+    }
+    catch(err) {
+        next(err)
+    }
+})
+
 module.exports=router;
