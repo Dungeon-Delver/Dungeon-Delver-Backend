@@ -129,6 +129,35 @@ class Party {
     party.destroy();
   }
 
+  static async partyRemove(dmId, userId, partyId) {
+    const Parties = Parse.Object.extend("Party")
+    const partyQuery = new Parse.Query(Parties)
+    const party = await partyQuery.get(partyId)
+
+    const playerQuery = new Parse.Query("User")
+    const player = await playerQuery.get(userId)
+    const dmQuery = new Parse.Query("User")
+    const dm = await dmQuery.get(dmId)
+    const partyDm = await party.get("dm")
+
+    if(dm.objectId !== partyDm.objectId) {
+      throw new BadRequestError("Only the DM can remove users from a party")
+    }
+
+    const notification = new Parse.Object("Notification");
+    notification.set("user", player)
+    notification.set("type", "remove")
+    notification.set("sourceUser", dm)
+    notification.save();
+
+    player.decrement("numParties", 1);
+    await player.save({}, {useMasterKey: true});
+
+    let playersRelation = party.relation('players')
+    playersRelation.remove(player)
+    party.save()
+  }
+
 }
 
 module.exports = Party

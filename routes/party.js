@@ -81,18 +81,18 @@ router.post("/:partyId/reject/:userId", async (req, res, next) => {
 })
 
 router.post("/:partyId/remove/:userId", async (req, res, next) => {
-    try {
-      const dm = req.body.userId.objectId
-      const userId = req.params.userId
-      const partyId = req.params.partyId;
-      await User.partyRemove(dm, userId, partyId)
-      res.status(201).json({})
-    }
-    catch(err) {
-      console.log(err)
-      next(err)
-    }
-  })
+  try {
+    const dmId = req.body.dm.objectId
+    const userId = req.params.userId
+    const partyId = req.params.partyId;
+    await Party.partyRemove(dmId, userId, partyId)
+    res.status(201).json({})
+  }
+  catch(err) {
+    console.log(err)
+    next(err)
+  }
+})
 
 router.post("/:partyId/delete", async (req, res, next) => {
     try {
