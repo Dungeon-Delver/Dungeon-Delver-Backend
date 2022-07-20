@@ -94,6 +94,22 @@ router.post("/:partyId/remove/:userId", async (req, res, next) => {
   }
 })
 
+router.post("/:partyId/modify", async (req, res, next) => {
+    try {
+        const body = req.body;
+        const partyId = req.params.partyId
+        const party = await Party.handleModifyParty(partyId, body)
+        if(party == null) {
+            throw new Error("Internal Server Error")
+        }
+        res.status(201).json({})
+    }
+    catch(err) {
+        console.log(err)
+        next(err)
+    }
+})
+
 router.post("/:partyId/delete", async (req, res, next) => {
     try {
         const partyId = req.params.partyId;
