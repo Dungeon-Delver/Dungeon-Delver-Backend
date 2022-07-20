@@ -54,18 +54,6 @@ class Party {
   }
 
   static async handleSearchParty(searchParameters) {
-    const getMembers = async (parties) => {
-      const newParties = await Promise.all(parties.map( async item => {
-      const dmObj = await item.get("dm")
-      const dmId = dmObj.id
-      const dmQuery = new Parse.Query("User")
-      const dm = await dmQuery.get(dmId)
-      const players = await item.get("players").query().find()
-      return {party: item, dm: dm, players: players};
-    }))
-    return newParties
-  }
-
     const searchProps = ["experience", "type", "genre", "level"]
     searchProps.forEach((item) => {
       if(!searchParameters.hasOwnProperty(item)) {
@@ -92,9 +80,7 @@ class Party {
       return null;
     }
 
-    const partiesRet = await getMembers(parties)
-
-    return partiesRet;
+    return parties;
   }
 
   static async getMembers(partyId) {
