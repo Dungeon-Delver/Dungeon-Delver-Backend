@@ -53,6 +53,36 @@ class Party {
     return users;
   }
 
+  static async handleSearchParty(searchParameters) {
+    const searchProps = ["experience", "type", "genre", "level"]
+    searchProps.forEach((item) => {
+      if(!searchParameters.hasOwnProperty(item)) {
+        throw new BadRequestError("Missing Search Parameters")
+      }
+    })
+    const experienceQuery = new Parse.Query("Party");
+    const typeQuery = new Parse.Query("Party")
+    const genreQuery = new Parse.Query("Party")
+    const levelQuery = new Parse.Query("Party")
+    const statusQuery = new Parse.Query("Party")
+
+    experienceQuery.equalTo("searchParameters.experience", searchParameters.experience)
+    typeQuery.equalTo("searchParameters.type", searchParameters.type)
+    genreQuery.equalTo("searchParameters.genre", searchParameters.genre)
+    levelQuery.equalTo("searchParameters.level", searchParameters.level)
+    statusQuery.notEqualTo("status", "Closed")
+
+    const query =  Parse.Query.and(experienceQuery, typeQuery, genreQuery, levelQuery, statusQuery)
+
+    const parties = await query.find();
+
+    if(parties.length==0) {
+      return null;
+    }
+
+    return parties;
+  }
+
   static async getMembers(partyId) {
     const query = new Parse.Query("Party")
     const party = await query.get(partyId)
