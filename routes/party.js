@@ -32,9 +32,6 @@ router.post("/search", async (req, res, next) => {
     try {
         const searchParameters = req.body.searchParameters;
         const parties = await Party.handleSearchParty(searchParameters)
-        if(parties == null) {
-            throw new NotFoundError("There are no parties that meet these criteria")
-        }
         res.status(201).json({ parties })
     }
     catch(err) {
