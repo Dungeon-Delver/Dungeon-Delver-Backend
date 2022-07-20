@@ -28,6 +28,20 @@ router.get("/:partyId", async (req, res, next) => {
     }
 })
 
+router.post("/search", async (req, res, next) => {
+    try {
+        const body = req.body;
+        const parties = await Party.handleSearchParty(body)
+        if(parties == null) {
+            throw new NotFoundError("There are no parties that meet these criteria")
+        }
+        res.status(201).json({ parties })
+    }
+    catch(err) {
+        next(err)
+    }
+})
+
 router.get("/:partyId/requested", async (req, res, next) => {
     try {
         const partyId = req.params.partyId;
