@@ -73,11 +73,16 @@ class Party {
     const findPlayerParties = new Parse.Query("Party")
     const playerQuery = new Parse.Query("Party")
 
-
     experienceQuery.equalTo("searchParameters.experience", searchParameters.experience)
-    typeQuery.equalTo("searchParameters.type", searchParameters.type)
-    genreQuery.equalTo("searchParameters.genre", searchParameters.genre)
-    levelQuery.equalTo("searchParameters.level", searchParameters.level)
+    if(searchParameters.type.substring(0, 3) !=="Any") {
+      typeQuery.equalTo("searchParameters.type", searchParameters.type)
+    }
+    if(searchParameters.genre.substring(0, 3) !=="Any") {
+      genreQuery.equalTo("searchParameters.genre", searchParameters.genre)
+    }
+    if(searchParameters.level.substring(0, 3) !=="Any") {
+      levelQuery.equalTo("searchParameters.level", searchParameters.level)
+    }
     statusQuery.notEqualTo("status", "Closed")
     dmQuery.notEqualTo("dm", { '__type': 'Pointer', 'className': '_User', 'objectId': userId })
     findPlayerParties.equalTo("players", user)
