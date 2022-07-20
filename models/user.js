@@ -96,7 +96,6 @@ class User {
     playersRequestedRelation.remove(player)
     party.save()
   }
-
 }
 
 module.exports = User
