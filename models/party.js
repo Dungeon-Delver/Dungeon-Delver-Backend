@@ -89,7 +89,7 @@ class Party {
     playerQuery.doesNotMatchKeyInQuery("objectId", "objectId", findPlayerParties)
 
     const query =  Parse.Query.and(experienceQuery, typeQuery, genreQuery, levelQuery, statusQuery, dmQuery, playerQuery)
-
+    query.ascending("createdAt")
     const parties = await query.find();
 
     if(parties.length==0) {
