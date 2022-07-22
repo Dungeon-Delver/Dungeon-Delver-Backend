@@ -1,7 +1,13 @@
 const app = require("./app")
+const chatApp = require("./chatApp")
 
-const port = process.env.PORT || 3001
+const appPort = process.env.PORT || 3001
+const chatPort = 3002
 
-app.listen(port, () => {
-  console.log(`🚀 Server listening on port ` + port)
+app.listen(appPort, () => {
+  console.log(`🚀 Server listening on port ` + appPort)
+})
+
+chatApp.listen(chatPort, () => {
+  console.log(`🚀 Chat server listening on port ` + chatPort)
 })
