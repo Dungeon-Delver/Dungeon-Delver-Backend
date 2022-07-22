@@ -16,8 +16,14 @@ io.on("connection", (socket) => {
   socket.join(roomId);
 
   // Listen for new messages
-  socket.on(NEW_CHAT_MESSAGE_EVENT, (data) => {
-    axios.post(`${BACKEND_SERVER}party/${roomId}/chat`, data)
+  socket.on(NEW_CHAT_MESSAGE_EVENT, async (data) => {
+    try {
+      await axios.post(`${BACKEND_SERVER}party/${data.partyId}/chat`, data)
+    }
+    catch (error) {
+      console.error(error)
+    }
+    
     io.in(roomId).emit(NEW_CHAT_MESSAGE_EVENT, data);
   });
 
