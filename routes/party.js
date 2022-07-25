@@ -135,4 +135,17 @@ router.post("/:partyId/delete", async (req, res, next) => {
     }
 })
 
+router.post("/:partyId/chat", async (req, res, next) => {
+    try {
+        const body = req.body;
+        const partyId = req.params.partyId
+        await Party.addChat(partyId, body)
+        res.status(201).json({})
+    }
+    catch(err) {
+        console.log(err)
+        next(err)
+    }
+})
+
 module.exports=router;

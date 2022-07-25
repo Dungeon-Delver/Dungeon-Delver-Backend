@@ -1,5 +1,4 @@
 const { BadRequestError } = require("../utils/errors")
-
 const Parse = require("../utils/initializeParse")
 
 class User {
@@ -30,6 +29,17 @@ class User {
     const playerPartiesRet = await getMembers(playerParties)
 
     return {dmParties: dmPartiesRet, playerParties: playerPartiesRet};
+  }
+
+  static async getUser(userId) {
+    try {
+      const UserQuery = new Parse.Query("User")
+      const user = await UserQuery.get(userId)
+      return user
+    }
+    catch (err) {
+      throw new BadRequestError("Invalid user id")
+    }
   }
 
   static async requestPartyJoin(userId, partyId) {

@@ -1,4 +1,5 @@
-
+const axios = require('axios');
+const BACKEND_SERVER = "http://localhost:3001/"
 const app = require("http").createServer();
 const io = require("socket.io")(app, {
   cors: {
@@ -16,6 +17,7 @@ io.on("connection", (socket) => {
 
   // Listen for new messages
   socket.on(NEW_CHAT_MESSAGE_EVENT, (data) => {
+    axios.post(`${BACKEND_SERVER}party/${roomId}/chat`, data)
     io.in(roomId).emit(NEW_CHAT_MESSAGE_EVENT, data);
   });
 
