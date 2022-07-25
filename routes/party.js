@@ -148,4 +148,17 @@ router.post("/:partyId/chat", async (req, res, next) => {
     }
 })
 
+router.post("/:partyId/messages", async (req, res, next) => {
+    try {
+        const body = req.body;
+        const partyId = req.params.partyId
+        const messages = await Party.getMessages(partyId, body)
+        res.status(201).json({messages})
+    }
+    catch(err) {
+        console.log(err)
+        next(err)
+    }
+})
+
 module.exports=router;
