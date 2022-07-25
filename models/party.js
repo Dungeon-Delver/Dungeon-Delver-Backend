@@ -53,26 +53,37 @@ class Party {
     return users;
   }
 
-  static async handleSearchParty(searchParameters) {
+  static async handleSearchParty(searchParameters, userId) {
     const searchProps = ["experience", "type", "genre", "level"]
     searchProps.forEach((item) => {
       if(!searchParameters.hasOwnProperty(item)) {
         throw new BadRequestError("Missing Search Parameters")
       }
     })
+
+    const userQuery = new Parse.Query("User")
+    const user = await userQuery.get(userId)
+
     const experienceQuery = new Parse.Query("Party");
     const typeQuery = new Parse.Query("Party")
     const genreQuery = new Parse.Query("Party")
     const levelQuery = new Parse.Query("Party")
     const statusQuery = new Parse.Query("Party")
+    const dmQuery = new Parse.Query("Party");
+    const findPlayerParties = new Parse.Query("Party")
+    const playerQuery = new Parse.Query("Party")
+
 
     experienceQuery.equalTo("searchParameters.experience", searchParameters.experience)
     typeQuery.equalTo("searchParameters.type", searchParameters.type)
     genreQuery.equalTo("searchParameters.genre", searchParameters.genre)
     levelQuery.equalTo("searchParameters.level", searchParameters.level)
     statusQuery.notEqualTo("status", "Closed")
+    dmQuery.notEqualTo("dm", { '__type': 'Pointer', 'className': '_User', 'objectId': userId })
+    findPlayerParties.equalTo("players", user)
+    playerQuery.doesNotMatchKeyInQuery("objectId", "objectId", findPlayerParties)
 
-    const query =  Parse.Query.and(experienceQuery, typeQuery, genreQuery, levelQuery, statusQuery)
+    const query =  Parse.Query.and(experienceQuery, typeQuery, genreQuery, levelQuery, statusQuery, dmQuery, playerQuery)
 
     const parties = await query.find();
 
