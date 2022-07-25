@@ -28,6 +28,19 @@ router.get("/:partyId", async (req, res, next) => {
     }
 })
 
+router.post("/search", async (req, res, next) => {
+    try {
+        const searchParameters = req.body.searchParameters;
+        const userId = req.body.user
+        const parties = await Party.handleSearchParty(searchParameters, userId)
+        res.status(201).json({ parties })
+    }
+    catch(err) {
+        console.log(err)
+        next(err)
+    }
+})
+
 router.get("/:partyId/requested", async (req, res, next) => {
     try {
         const partyId = req.params.partyId;
