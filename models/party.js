@@ -55,11 +55,6 @@ class Party {
 
   static async handleSearchParty(searchParameters, userId, first, last) {
     const searchProps = ["experience", "type", "genre", "level"]
-    searchProps.forEach((item) => {
-      if(!searchParameters.hasOwnProperty(item)) {
-        throw new BadRequestError("Missing Search Parameters")
-      }
-    })
 
     const pageLimit = 2;
 
