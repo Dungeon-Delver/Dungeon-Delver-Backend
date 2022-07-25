@@ -1,6 +1,7 @@
 const { BadRequestError, NotFoundError } = require("../utils/errors")
 
 const Parse = require("../utils/initializeParse")
+const User = require("./user")
 
 class Party {
   static async handleCreateParty(body) {
@@ -234,6 +235,23 @@ class Party {
     let playersRelation = party.relation('players')
     playersRelation.remove(player)
     party.save()
+  }
+
+  static async addChat(partyId, body) {
+    const partyQuery = new Parse.Query("Party")
+    const party = await partyQuery.get(partyId)
+
+    const sender = await User.getUser(body.senderId)
+
+    const message = new Parse.Object("Message")
+    message.set("user", sender)
+    message.set("message", body.body)
+    await message.save();
+
+    const messages = party.get("messages")
+    messages.add(message);
+
+    return;
   }
 
 }
