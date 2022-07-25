@@ -1,4 +1,4 @@
-const { BadRequestError } = require("../utils/errors")
+const { BadRequestError, NotFoundError } = require("../utils/errors")
 
 const Parse = require("../utils/initializeParse")
 
@@ -38,12 +38,16 @@ class Party {
 
   static async getParty(partyId) {
       const query = new Parse.Query("Party")
-      const party = await query.get(partyId)
-
-      const requestedUsers = await this.getRequestedUsers(partyId)
-      const members = await this.getMembers(partyId)
-
-      return {party: party, requestedUsers: requestedUsers, members: members};
+      try {
+        const party = await query.get(partyId)
+        const requestedUsers = await this.getRequestedUsers(partyId)
+        const members = await this.getMembers(partyId)
+  
+        return {party: party, requestedUsers: requestedUsers, members: members};
+      }
+      catch {
+        throw new NotFoundError("This Party Does Not Exist")
+      }
   }
 
   static async getRequestedUsers(partyId) {
