@@ -264,7 +264,9 @@ class Party {
         const userQuery = new Parse.Query("User")
         const messageUser = await userQuery.get(userId)
         const message =  item.get("message")
-        return {user: messageUser.toJSON(), message: message}
+        const name = messageUser.get("username")
+        const picture = messageUser.get("picture")
+        return {user: {username: name, picture: picture}, body: message}
     }))
     return newMessages
   }
@@ -289,6 +291,7 @@ class Party {
     if(messages.length<=messagesLimit) {
       reachedEnd = true;
     }
+    returnMessages.reverse();
 
     return {messages: returnMessages, reachedEnd: reachedEnd}
   }
