@@ -266,7 +266,7 @@ class Party {
         const message =  item.get("message")
         const name = messageUser.get("username")
         const picture = messageUser.get("picture")
-        return {user: {username: name, picture: picture}, body: message}
+        return {senderId: userId, user: {username: name, picture: picture}, body: message, ownedByCurrentUser: body.userId === userId}
     }))
     return newMessages
   }
