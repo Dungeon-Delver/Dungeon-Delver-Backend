@@ -104,7 +104,6 @@ class Party {
     }
 
     const query = Parse.Query.and(experienceQuery, typeQuery, genreQuery, levelQuery, statusQuery, dmQuery, playerQuery, pageQuery)
-    console.log('query: ',await query.count());
     if(ascending) {
       query.ascending("createdAt")
     }
