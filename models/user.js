@@ -18,13 +18,15 @@ class User {
 
     const Parties = Parse.Object.extend("Party");
     const dmQuery = new Parse.Query(Parties);
+    dmQuery.descending('createdAt')
     const dmParties = await dmQuery.equalTo("dm", { '__type': 'Pointer', 'className': '_User', 'objectId': userId }).find();
     const dmPartiesRet =  await getMembers(dmParties)
 
-    const playerQuery = new Parse.Query(Parties);
     const userQuery = new Parse.Query("User")
     const user = await userQuery.get(userId)
 
+    const playerQuery = new Parse.Query(Parties);
+    playerQuery.descending('createdAt')
     const playerParties = await playerQuery.equalTo("players", user).find()
     const playerPartiesRet = await getMembers(playerParties)
 

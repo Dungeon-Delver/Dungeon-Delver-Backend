@@ -58,13 +58,10 @@ class Party {
     return users;
   }
 
-  static async handleSearchParty(searchParameters, userId) {
+  static async handleSearchParty(searchParameters, userId, first, last) {
     const searchProps = ["experience", "type", "genre", "level"]
-    searchProps.forEach((item) => {
-      if(!searchParameters.hasOwnProperty(item)) {
-        throw new BadRequestError("Missing Search Parameters")
-      }
-    })
+
+    const pageLimit = 2;
 
     const userQuery = new Parse.Query("User")
     const user = await userQuery.get(userId)
@@ -77,26 +74,62 @@ class Party {
     const dmQuery = new Parse.Query("Party");
     const findPlayerParties = new Parse.Query("Party")
     const playerQuery = new Parse.Query("Party")
+    const firstQuery = new Parse.Query("Party")
+    const lastQuery = new Parse.Query("Party")
 
+    var ascending = first===null ? false : true;
 
     experienceQuery.equalTo("searchParameters.experience", searchParameters.experience)
-    typeQuery.equalTo("searchParameters.type", searchParameters.type)
-    genreQuery.equalTo("searchParameters.genre", searchParameters.genre)
-    levelQuery.equalTo("searchParameters.level", searchParameters.level)
+    if(searchParameters.hasOwnProperty("type")) {
+      typeQuery.equalTo("searchParameters.type", searchParameters.type)
+    }
+    if(searchParameters.hasOwnProperty("genre")) {
+      genreQuery.equalTo("searchParameters.genre", searchParameters.genre)
+    }
+    if(searchParameters.hasOwnProperty("level")) {
+      levelQuery.equalTo("searchParameters.level", searchParameters.level)
+    }
     statusQuery.notEqualTo("status", "Closed")
     dmQuery.notEqualTo("dm", { '__type': 'Pointer', 'className': '_User', 'objectId': userId })
     findPlayerParties.equalTo("players", user)
     playerQuery.doesNotMatchKeyInQuery("objectId", "objectId", findPlayerParties)
 
-    const query =  Parse.Query.and(experienceQuery, typeQuery, genreQuery, levelQuery, statusQuery, dmQuery, playerQuery)
+    if(first!==null) {
+      const getFirstQuery = new Parse.Query("Party")
+      const firstParty = await getFirstQuery.get(first.objectId)
+      firstQuery.greaterThan("createdAt", firstParty.get("createdAt"))
+    }
+    else if(last!==null) {
+      const getLastQuery = new Parse.Query("Party")
+      const lastParty = await getLastQuery.get(last.objectId)
+      lastQuery.lessThan("createdAt", lastParty.createdAt)
+    }
 
+    const query =  Parse.Query.and(experienceQuery, typeQuery, genreQuery, levelQuery, statusQuery, dmQuery, playerQuery, firstQuery, lastQuery)
+    if(ascending) {
+      query.ascending("createdAt")
+    }
+    else {
+      query.descending("createdAt")
+    }
+    query.limit(pageLimit+1);
     const parties = await query.find();
 
     if(parties.length==0) {
       return null;
     }
+    var reachedEnd = false;
+    if(parties.length<=pageLimit) {
+      reachedEnd = true;
+    }
+    else {
+      parties.splice(pageLimit)
+    }
+    if(first!==null) {
+      parties.reverse();
+    }
 
-    return parties;
+    return {parties: parties, reachedEnd: reachedEnd};
   }
 
   static async getMembers(partyId) {
