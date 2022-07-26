@@ -13,6 +13,7 @@ router.post("/create-party", async (req, res, next) => {
         res.status(201).json({ newParty })
     }
     catch(err) {
+        console.log(err)
         next(err)
     }
 })
@@ -24,6 +25,7 @@ router.get("/:partyId", async (req, res, next) => {
         res.status(200).json({ party })
     }
     catch(err) {
+        console.log(err)
         next(err)
     }
 })
@@ -131,6 +133,7 @@ router.post("/:partyId/delete", async (req, res, next) => {
         res.status(201).json({})
     }
     catch(err) {
+        console.log(err)
         next(err)
     }
 })

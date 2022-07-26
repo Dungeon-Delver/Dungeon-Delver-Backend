@@ -266,7 +266,7 @@ class Party {
         const message =  item.get("message")
         const name = messageUser.get("username")
         const picture = messageUser.get("picture")
-        return {senderId: userId, user: {username: name, picture: picture}, body: message, ownedByCurrentUser: body.userId === userId}
+        return {objectId: item.id, senderId: userId, user: {username: name, picture: picture}, body: message, ownedByCurrentUser: body.userId === userId}
     }))
     return newMessages
   }
@@ -274,24 +274,38 @@ class Party {
     const partyQuery = new Parse.Query("Party")
     const party = await partyQuery.get(partyId)
 
-    const messagesLimit = 50;
+    const messagesLimit = 15;
 
     const messages = party.get("messages")
 
     const messagesQuery = messages.query();
-    messagesQuery.limit(messagesLimit + 1)
-    messagesQuery.descending("createdAt")
-    const messagesObjects = await messagesQuery.find();
+    const query = new Parse.Query("Message")
+    
+    query.limit(messagesLimit+1)
+    query.matchesKeyInQuery("objectId", "objectId", messagesQuery)
+    query.descending("createdAt")
+
+    if(body.hasOwnProperty("firstMessage")) {
+      const getFirstQuery = new Parse.Query("Message")
+      const firstMessage = await getFirstQuery.get(body.firstMessage.objectId)
+      query.lessThan("createdAt", firstMessage.get("createdAt"))
+    }
+
+    const messagesObjects = await query.find();
+
+    let reachedEnd = false;
+    if(messagesObjects.length<=messagesLimit) {
+      reachedEnd = true;
+    }
+    else {
+      messagesObjects.splice(messagesLimit)
+    }
 
     const returnMessages = await getMessageUsers(messagesObjects)
 
-    //if(Object.keys(body).length !== 0)
-
-    var reachedEnd
-    if(messages.length<=messagesLimit) {
-      reachedEnd = true;
-    }
     returnMessages.reverse();
+
+   
 
     return {messages: returnMessages, reachedEnd: reachedEnd}
   }
