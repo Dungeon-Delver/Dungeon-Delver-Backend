@@ -250,8 +250,50 @@ class Party {
 
     const messages = party.get("messages")
     messages.add(message);
+    await party.save();
 
     return;
+  }
+
+  static async getMessages(partyId, body) {
+
+    const getMessageUsers = async (messages) => {
+      const newMessages = await Promise.all(messages.map( async item => {
+        const user =  item.get("user")
+        const userId = user.id
+        const userQuery = new Parse.Query("User")
+        const messageUser = await userQuery.get(userId)
+        const message =  item.get("message")
+        const name = messageUser.get("username")
+        const picture = messageUser.get("picture")
+        return {senderId: userId, user: {username: name, picture: picture}, body: message, ownedByCurrentUser: body.userId === userId}
+    }))
+    return newMessages
+  }
+
+    const partyQuery = new Parse.Query("Party")
+    const party = await partyQuery.get(partyId)
+
+    const messagesLimit = 50;
+
+    const messages = party.get("messages")
+
+    const messagesQuery = messages.query();
+    messagesQuery.limit(messagesLimit + 1)
+    messagesQuery.descending("createdAt")
+    const messagesObjects = await messagesQuery.find();
+
+    const returnMessages = await getMessageUsers(messagesObjects)
+
+    //if(Object.keys(body).length !== 0)
+
+    var reachedEnd
+    if(messages.length<=messagesLimit) {
+      reachedEnd = true;
+    }
+    returnMessages.reverse();
+
+    return {messages: returnMessages, reachedEnd: reachedEnd}
   }
 
 }
