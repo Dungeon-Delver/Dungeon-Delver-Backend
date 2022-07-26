@@ -59,7 +59,6 @@ class Party {
   }
 
   static async handleSearchParty(searchParameters, userId, first, last) {
-    const searchProps = ["experience", "type", "genre", "level"]
 
     const pageLimit = 2;
 
@@ -74,8 +73,7 @@ class Party {
     const dmQuery = new Parse.Query("Party");
     const findPlayerParties = new Parse.Query("Party")
     const playerQuery = new Parse.Query("Party")
-    const firstQuery = new Parse.Query("Party")
-    const lastQuery = new Parse.Query("Party")
+    const pageQuery = new Parse.Query("Party")
 
     var ascending = first===null ? false : true;
 
@@ -97,15 +95,16 @@ class Party {
     if(first!==null) {
       const getFirstQuery = new Parse.Query("Party")
       const firstParty = await getFirstQuery.get(first.objectId)
-      firstQuery.greaterThan("createdAt", firstParty.get("createdAt"))
+      pageQuery.greaterThan("createdAt", firstParty.get("createdAt"))
     }
     else if(last!==null) {
       const getLastQuery = new Parse.Query("Party")
       const lastParty = await getLastQuery.get(last.objectId)
-      lastQuery.lessThan("createdAt", lastParty.createdAt)
+      pageQuery.lessThan("createdAt", lastParty.get("createdAt"))
     }
 
-    const query =  Parse.Query.and(experienceQuery, typeQuery, genreQuery, levelQuery, statusQuery, dmQuery, playerQuery, firstQuery, lastQuery)
+    const query = Parse.Query.and(experienceQuery, typeQuery, genreQuery, levelQuery, statusQuery, dmQuery, playerQuery, pageQuery)
+    console.log('query: ',await query.count());
     if(ascending) {
       query.ascending("createdAt")
     }
