@@ -10,6 +10,7 @@ router.post("/", async (req, res, next) => {
     const newUser = await User.handleFacebookLogin(body)
     res.status(201).json({ newUser: newUser })
   } catch (err) {
+    console.log(err)
     next(err)
   }
 })
@@ -84,6 +85,7 @@ router.post("/:userId/disable", async (req, res, next) => {
     res.status(204);
   }
   catch(err) {
+    console.log(err)
     next(err)
   }
 })
