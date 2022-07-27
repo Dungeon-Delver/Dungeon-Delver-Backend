@@ -19,12 +19,15 @@ io.on("connection", (socket) => {
   socket.on(NEW_CHAT_MESSAGE_EVENT, async (data) => {
     try {
       await axios.post(`${BACKEND_SERVER}party/${data.partyId}/chat`, data)
+      var currentDate = new Date();
+      data.createdAt=currentDate
+      io.in(roomId).emit(NEW_CHAT_MESSAGE_EVENT, data);
+
     }
     catch (error) {
       console.error(error)
     }
     
-    io.in(roomId).emit(NEW_CHAT_MESSAGE_EVENT, data);
   });
 
   // Leave the room if the user closes the socket
