@@ -74,9 +74,6 @@ class Party {
     const findPlayerParties = new Parse.Query("Party")
     const playerQuery = new Parse.Query("Party")
     const pageQuery = new Parse.Query("Party")
-
-    var ascending = first===null ? false : true;
-
     experienceQuery.equalTo("searchParameters.experience", searchParameters.experience)
     if(searchParameters.hasOwnProperty("type")) {
       typeQuery.equalTo("searchParameters.type", searchParameters.type)
@@ -91,6 +88,349 @@ class Party {
     dmQuery.notEqualTo("dm", { '__type': 'Pointer', 'className': '_User', 'objectId': userId })
     findPlayerParties.equalTo("players", user)
     playerQuery.doesNotMatchKeyInQuery("objectId", "objectId", findPlayerParties)
+
+    const reverseTypeQuery = new Parse.Query("Party")
+    reverseTypeQuery.doesNotMatchKeyInQuery("objectId", "objectId", typeQuery)
+    const reverseGenreQuery = new Parse.Query("Party")
+    reverseGenreQuery.doesNotMatchKeyInQuery("objectId", "objectId", genreQuery)
+    const reverseLevelQuery = new Parse.Query("Party")
+    reverseLevelQuery.doesNotMatchKeyInQuery("objectId", "objectId", levelQuery)
+
+    const firstRequest = async () => {
+
+      const query = Parse.Query.and(experienceQuery, typeQuery, genreQuery, levelQuery, statusQuery, dmQuery, playerQuery)
+      query.descending("createdAt")
+      query.limit(pageLimit+1);
+      const parties = await query.find();
+
+      const partiesObjects = parties.map(item => {
+        return item.toJSON();
+      })
+
+      var reachedEnd = false;
+      partiesObjects.forEach((item) => {
+        item.relevance = 100
+      })
+      if(partiesObjects.length<=pageLimit) {
+        const restOfParties = await last75(null, pageLimit - partiesObjects.length)
+        reachedEnd = restOfParties.reachedEnd;
+        return {parties: [...partiesObjects, ...restOfParties.parties], reachedEnd: reachedEnd};
+      }
+      else {
+        partiesObjects.splice(pageLimit)
+      }
+
+      if(first!==null) {
+        partiesObjects.reverse();
+      }
+
+      return {parties: partiesObjects, reachedEnd: reachedEnd};
+    }
+
+    const last100 = async (lastObjectId, limit) => {
+      const pointerQuery = new Parse.Query("Party");
+
+      if(lastObjectId!==null) {
+        const getLastQuery = new Parse.Query("Party")
+        const lastParty = await getLastQuery.get(lastObjectId)
+        pointerQuery.lessThan("createdAt", lastParty.get("createdAt"))
+      } 
+
+      const query = Parse.Query.and(experienceQuery, typeQuery, genreQuery, levelQuery, statusQuery, dmQuery, playerQuery, pointerQuery)
+      query.descending("createdAt")
+      query.limit(limit+1);
+      const parties = await query.find();
+
+      const partiesObjects = parties.map(item => {
+        return item.toJSON();
+      })
+
+      var reachedEnd = false;
+      partiesObjects.forEach((item) => {
+        item.relevance = 100
+      })
+      if(partiesObjects.length<=limit) {
+        const restOfParties = await last75(null, limit - partiesObjects.length)
+        reachedEnd = restOfParties.reachedEnd;
+        return {parties: [...partiesObjects, ...restOfParties.parties], reachedEnd: reachedEnd};
+      }
+      else {
+        partiesObjects.splice(limit)
+      }
+      return {parties: partiesObjects, reachedEnd: reachedEnd};
+    }
+
+    const last75 = async (lastObjectId, limit) => {
+      const pointerQuery = new Parse.Query("Party");
+
+      if(lastObjectId!==null) {
+        const getLastQuery = new Parse.Query("Party")
+        const lastParty = await getLastQuery.get(lastObjectId)
+        pointerQuery.lessThan("createdAt", lastParty.get("createdAt"))
+      }
+
+      const query = Parse.Query.and(experienceQuery, typeQuery, genreQuery, reverseLevelQuery, statusQuery, dmQuery, playerQuery, pointerQuery)
+      query.descending("createdAt")
+      query.limit(limit+1);
+      const parties = await query.find();
+
+      const partiesObjects = parties.map(item => {
+        return item.toJSON();
+      })
+
+      var reachedEnd = false;
+      partiesObjects.forEach((item) => {
+        item.relevance = 75
+      })
+      if(partiesObjects.length<=limit) {
+        const restOfParties = await last65(null, limit - partiesObjects.length)
+        reachedEnd = restOfParties.reachedEnd;
+        return {parties: [...partiesObjects, ...restOfParties.parties], reachedEnd: reachedEnd};
+      }
+      else {
+        partiesObjects.splice(limit)
+      }
+      return {parties: partiesObjects, reachedEnd: reachedEnd};
+    }
+
+    const last65 = async (lastObjectId, limit) => {
+      const pointerQuery = new Parse.Query("Party");
+
+      if(lastObjectId!==null) {
+        const getLastQuery = new Parse.Query("Party")
+        const lastParty = await getLastQuery.get(lastObjectId)
+        pointerQuery.lessThan("createdAt", lastParty.get("createdAt"))
+      }
+
+      const query = Parse.Query.and(experienceQuery, typeQuery, reverseGenreQuery, levelQuery, statusQuery, dmQuery, playerQuery, pointerQuery)
+      query.descending("createdAt")
+      query.limit(limit+1);
+      const parties = await query.find();
+
+      const partiesObjects = parties.map(item => {
+        return item.toJSON();
+      })
+
+      var reachedEnd = false;
+      partiesObjects.forEach((item) => {
+        item.relevance = 65
+      })
+      if(partiesObjects.length<=limit) {
+        const restOfParties = await last60(null, limit - partiesObjects.length)
+        reachedEnd = restOfParties.reachedEnd;
+        return {parties: [...partiesObjects, ...restOfParties.parties], reachedEnd: reachedEnd};
+      }
+      else {
+        partiesObjects.splice(limit)
+      }
+      return {parties: partiesObjects, reachedEnd: reachedEnd};
+    }
+
+    const last60 = async (lastObjectId, limit) => {
+      const pointerQuery = new Parse.Query("Party");
+
+      if(lastObjectId!==null) {
+        const getLastQuery = new Parse.Query("Party")
+        const lastParty = await getLastQuery.get(lastObjectId)
+        pointerQuery.lessThan("createdAt", lastParty.get("createdAt"))
+      }
+
+      const query = Parse.Query.and(experienceQuery, reverseTypeQuery, genreQuery, levelQuery, statusQuery, dmQuery, playerQuery, pointerQuery)
+      query.descending("createdAt")
+      query.limit(limit+1);
+      const parties = await query.find();
+
+      const partiesObjects = parties.map(item => {
+        return item.toJSON();
+      })
+
+      var reachedEnd = false;
+      partiesObjects.forEach((item) => {
+        item.relevance = 60
+      })
+      if(partiesObjects.length<=limit) {
+        const restOfParties = await last40(null, limit - partiesObjects.length)
+        reachedEnd = restOfParties.reachedEnd;
+        return {parties: [...partiesObjects, ...restOfParties.parties], reachedEnd: reachedEnd};
+      }
+      else {
+        partiesObjects.splice(limit)
+      }
+      return {parties: partiesObjects, reachedEnd: reachedEnd};
+    }
+
+    const last40 = async (lastObjectId, limit) => {
+      const pointerQuery = new Parse.Query("Party");
+
+      if(lastObjectId!==null) {
+        const getLastQuery = new Parse.Query("Party")
+        const lastParty = await getLastQuery.get(lastObjectId)
+        pointerQuery.lessThan("createdAt", lastParty.get("createdAt"))
+      }
+
+      const query = Parse.Query.and(experienceQuery, typeQuery, reverseGenreQuery, reverseLevelQuery, statusQuery, dmQuery, playerQuery, pointerQuery)
+      query.descending("createdAt")
+      query.limit(limit+1);
+      const parties = await query.find();
+
+      const partiesObjects = parties.map(item => {
+        return item.toJSON();
+      })
+
+      var reachedEnd = false;
+      partiesObjects.forEach((item) => {
+        item.relevance = 40
+      })
+      if(partiesObjects.length<=limit) {
+        const restOfParties = await last35(null, limit - partiesObjects.length)
+        reachedEnd = restOfParties.reachedEnd;
+        return {parties: [...partiesObjects, ...restOfParties.parties], reachedEnd: reachedEnd};
+      }
+      else {
+        partiesObjects.splice(limit)
+      }
+      return {parties: partiesObjects, reachedEnd: reachedEnd};
+    }
+
+    const last35 = async (lastObjectId, limit) => {
+      const pointerQuery = new Parse.Query("Party");
+
+      if(lastObjectId!==null) {
+        const getLastQuery = new Parse.Query("Party")
+        const lastParty = await getLastQuery.get(lastObjectId)
+        pointerQuery.lessThan("createdAt", lastParty.get("createdAt"))
+      }
+
+      const query = Parse.Query.and(experienceQuery, reverseTypeQuery, genreQuery, reverseLevelQuery, statusQuery, dmQuery, playerQuery, pointerQuery)
+      query.descending("createdAt")
+      query.limit(limit+1);
+      const parties = await query.find();
+
+      const partiesObjects = parties.map(item => {
+        return item.toJSON();
+      })
+
+      var reachedEnd = false;
+      partiesObjects.forEach((item) => {
+        item.relevance = 35
+      })
+      if(partiesObjects.length<=limit) {
+        const restOfParties = await last25(null, limit - partiesObjects.length)
+        reachedEnd = restOfParties.reachedEnd;
+        return {parties: [...partiesObjects, ...restOfParties.parties], reachedEnd: reachedEnd};
+      }
+      else {
+        partiesObjects.splice(limit)
+      }
+      return {parties: partiesObjects, reachedEnd: reachedEnd};
+    }
+
+    const last25 = async (lastObjectId, limit) => {
+      const pointerQuery = new Parse.Query("Party");
+
+      if(lastObjectId!==null) {
+        const getLastQuery = new Parse.Query("Party")
+        const lastParty = await getLastQuery.get(lastObjectId)
+        pointerQuery.lessThan("createdAt", lastParty.get("createdAt"))
+      }
+
+      const query = Parse.Query.and(experienceQuery, reverseTypeQuery, reverseGenreQuery, levelQuery, statusQuery, dmQuery, playerQuery, pointerQuery)
+      query.descending("createdAt")
+      query.limit(limit+1);
+      const parties = await query.find();
+
+      const partiesObjects = parties.map(item => {
+        return item.toJSON();
+      })
+
+      var reachedEnd = false;
+      partiesObjects.forEach((item) => {
+        item.relevance = 25
+      })
+      if(partiesObjects.length<=limit) {
+        const restOfParties = await last0(null, limit - partiesObjects.length)
+        reachedEnd = restOfParties.reachedEnd;
+        return {parties: [...partiesObjects, ...restOfParties.parties], reachedEnd: reachedEnd};
+      }
+      else {
+        partiesObjects.splice(limit)
+      }
+      return {parties: partiesObjects, reachedEnd: reachedEnd};
+    }
+
+    const last0 = async (lastObjectId, limit) => {
+      const pointerQuery = new Parse.Query("Party");
+
+      if(lastObjectId!==null) {
+        const getLastQuery = new Parse.Query("Party")
+        const lastParty = await getLastQuery.get(lastObjectId)
+        pointerQuery.lessThan("createdAt", lastParty.get("createdAt"))
+      }
+
+      const query = Parse.Query.and(experienceQuery, reverseTypeQuery, reverseGenreQuery, reverseLevelQuery, statusQuery, dmQuery, playerQuery, pointerQuery)
+      query.descending("createdAt")
+      query.limit(limit+1);
+      const parties = await query.find();
+
+      const partiesObjects = parties.map(item => {
+        return item.toJSON();
+      })
+
+      var reachedEnd = false;
+      partiesObjects.forEach((item) => {
+        item.relevance = 0
+      })
+      if(partiesObjects.length<=limit) {
+        reachedEnd = true;
+        return {parties: partiesObjects, reachedEnd: reachedEnd};
+      }
+      else {
+        partiesObjects.splice(limit)
+      }
+      return {parties: partiesObjects, reachedEnd: reachedEnd};
+    }
+
+
+    
+    if(first!==null) {
+      if(first.relevance === 100)
+        return await first100(pageLimit);
+      if(first.relevance === 75)
+        return await first75(5);
+      if(first.relevance === 65)
+        return await first65(5);
+      if(first.relevance === 60)
+        return await first60(5);
+      if(first.relevance === 45)
+        return await first40(5);
+      if(first.relevance === 35)
+        return await first35(5);
+      if(first.relevance === 25)
+        return await first25(5)
+      if(first.relevance === 0) {
+        return await first0(5);
+      }
+    }
+    if(last!==null) {
+      if(last.relevance === 100)
+        return await last100(last.objectId, pageLimit);
+      if(last.relevance === 75)
+        return await last75(last.objectId, pageLimit);
+      if(last.relevance === 65)
+        return await last65(last.objectId, pageLimit);
+      if(last.relevance === 60)
+        return await last60(last.objectId, pageLimit);
+      if(last.relevance === 40)
+        return await last40(last.objectId, pageLimit);
+      if(last.relevance === 35)
+        return await last35(last.objectId, pageLimit);
+      if(last.relevance === 25)
+        return await last25(last.objectId, pageLimit)
+      if(last.relevance === 0) 
+        return await last0(last.objectId, pageLimit);
+      
+    }
+    return await firstRequest()
 
     if(first!==null) {
       const getFirstQuery = new Parse.Query("Party")
@@ -113,21 +453,40 @@ class Party {
     query.limit(pageLimit+1);
     const parties = await query.find();
 
-    if(parties.length==0) {
+    const partiesObjects = parties.map(item => {
+      return item.toJSON();
+    })
+
+    if(partiesObjects.length==0) {
       return null;
     }
     var reachedEnd = false;
-    if(parties.length<=pageLimit) {
+    if(partiesObjects.length<=pageLimit) {
       reachedEnd = true;
+      if(first!==null) {
+        partiesObjects.reverse();
+      }
+      partiesObjects.forEach((item) => {
+        item.relevance = 100
+      })
+      return {parties: partiesObjects, reachedEnd: reachedEnd};
     }
     else {
-      parties.splice(pageLimit)
-    }
-    if(first!==null) {
-      parties.reverse();
+      partiesObjects.splice(pageLimit)
     }
 
-    return {parties: parties, reachedEnd: reachedEnd};
+    if(first!==null) {
+      partiesObjects.reverse();
+    }
+    partiesObjects.forEach((item) => {
+      item.relevance = 100
+    })
+    return {parties: partiesObjects, reachedEnd: reachedEnd};
+    
+
+    
+
+    
   }
 
   static async getMembers(partyId) {
