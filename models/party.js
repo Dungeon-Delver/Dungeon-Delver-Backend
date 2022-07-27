@@ -59,7 +59,9 @@ class Party {
   }
 
   static async handleSearchParty(searchParameters, userId, first, last) {
-
+    console.log('last: ', last);
+    console.log('first: ', first);
+    
     const pageLimit = 2;
 
     const userQuery = new Parse.Query("User")
@@ -73,7 +75,7 @@ class Party {
     const dmQuery = new Parse.Query("Party");
     const findPlayerParties = new Parse.Query("Party")
     const playerQuery = new Parse.Query("Party")
-    const pageQuery = new Parse.Query("Party")
+
     experienceQuery.equalTo("searchParameters.experience", searchParameters.experience)
     if(searchParameters.hasOwnProperty("type")) {
       typeQuery.equalTo("searchParameters.type", searchParameters.type)
@@ -390,13 +392,13 @@ class Party {
       return {parties: partiesObjects, reachedEnd: reachedEnd};
     }
 
-    const first100 = async (lastObjectId, limit) => {
+    const first100 = async (firstObjectId, limit) => {
       const pointerQuery = new Parse.Query("Party");
 
-      if(lastObjectId!==null) {
+      if(firstObjectId!==null) {
         const getLastQuery = new Parse.Query("Party")
-        const lastParty = await getLastQuery.get(lastObjectId)
-        pointerQuery.lessThan("createdAt", lastParty.get("createdAt"))
+        const lastParty = await getLastQuery.get(firstObjectId)
+        pointerQuery.greaterThan("createdAt", lastParty.get("createdAt"))
       } 
 
       const query = Parse.Query.and(experienceQuery, typeQuery, genreQuery, levelQuery, statusQuery, dmQuery, playerQuery, pointerQuery)
@@ -423,13 +425,13 @@ class Party {
       return {parties: partiesObjects, reachedEnd: reachedEnd};
     }
 
-    const first75 = async (lastObjectId, limit) => {
+    const first75 = async (firstObjectId, limit) => {
       const pointerQuery = new Parse.Query("Party");
 
-      if(lastObjectId!==null) {
+      if(firstObjectId!==null) {
         const getLastQuery = new Parse.Query("Party")
-        const lastParty = await getLastQuery.get(lastObjectId)
-        pointerQuery.lessThan("createdAt", lastParty.get("createdAt"))
+        const lastParty = await getLastQuery.get(firstObjectId)
+        pointerQuery.greaterThan("createdAt", lastParty.get("createdAt"))
       }
 
       const query = Parse.Query.and(experienceQuery, typeQuery, genreQuery, reverseLevelQuery, statusQuery, dmQuery, playerQuery, pointerQuery)
@@ -457,13 +459,13 @@ class Party {
       return {parties: partiesObjects, reachedEnd: reachedEnd};
     }
 
-    const first65 = async (lastObjectId, limit) => {
+    const first65 = async (firstObjectId, limit) => {
       const pointerQuery = new Parse.Query("Party");
 
-      if(lastObjectId!==null) {
+      if(firstObjectId!==null) {
         const getLastQuery = new Parse.Query("Party")
-        const lastParty = await getLastQuery.get(lastObjectId)
-        pointerQuery.lessThan("createdAt", lastParty.get("createdAt"))
+        const lastParty = await getLastQuery.get(firstObjectId)
+        pointerQuery.greaterThan("createdAt", lastParty.get("createdAt"))
       }
 
       const query = Parse.Query.and(experienceQuery, typeQuery, reverseGenreQuery, levelQuery, statusQuery, dmQuery, playerQuery, pointerQuery)
@@ -491,13 +493,13 @@ class Party {
       return {parties: partiesObjects, reachedEnd: reachedEnd};
     }
 
-    const first60 = async (lastObjectId, limit) => {
+    const first60 = async (firstObjectId, limit) => {
       const pointerQuery = new Parse.Query("Party");
 
-      if(lastObjectId!==null) {
+      if(firstObjectId!==null) {
         const getLastQuery = new Parse.Query("Party")
-        const lastParty = await getLastQuery.get(lastObjectId)
-        pointerQuery.lessThan("createdAt", lastParty.get("createdAt"))
+        const lastParty = await getLastQuery.get(firstObjectId)
+        pointerQuery.greaterThan("createdAt", lastParty.get("createdAt"))
       }
 
       const query = Parse.Query.and(experienceQuery, reverseTypeQuery, genreQuery, levelQuery, statusQuery, dmQuery, playerQuery, pointerQuery)
@@ -525,13 +527,13 @@ class Party {
       return {parties: partiesObjects, reachedEnd: reachedEnd};
     }
 
-    const first40 = async (lastObjectId, limit) => {
+    const first40 = async (firstObjectId, limit) => {
       const pointerQuery = new Parse.Query("Party");
 
-      if(lastObjectId!==null) {
+      if(firstObjectId!==null) {
         const getLastQuery = new Parse.Query("Party")
-        const lastParty = await getLastQuery.get(lastObjectId)
-        pointerQuery.lessThan("createdAt", lastParty.get("createdAt"))
+        const lastParty = await getLastQuery.get(firstObjectId)
+        pointerQuery.greaterThan("createdAt", lastParty.get("createdAt"))
       }
 
       const query = Parse.Query.and(experienceQuery, typeQuery, reverseGenreQuery, reverseLevelQuery, statusQuery, dmQuery, playerQuery, pointerQuery)
@@ -559,13 +561,13 @@ class Party {
       return {parties: partiesObjects, reachedEnd: reachedEnd};
     }
 
-    const first35 = async (lastObjectId, limit) => {
+    const first35 = async (firstObjectId, limit) => {
       const pointerQuery = new Parse.Query("Party");
 
-      if(lastObjectId!==null) {
+      if(firstObjectId!==null) {
         const getLastQuery = new Parse.Query("Party")
-        const lastParty = await getLastQuery.get(lastObjectId)
-        pointerQuery.lessThan("createdAt", lastParty.get("createdAt"))
+        const lastParty = await getLastQuery.get(firstObjectId)
+        pointerQuery.greaterThan("createdAt", lastParty.get("createdAt"))
       }
 
       const query = Parse.Query.and(experienceQuery, reverseTypeQuery, genreQuery, reverseLevelQuery, statusQuery, dmQuery, playerQuery, pointerQuery)
@@ -593,13 +595,13 @@ class Party {
       return {parties: partiesObjects, reachedEnd: reachedEnd};
     }
 
-    const first25 = async (lastObjectId, limit) => {
+    const first25 = async (firstObjectId, limit) => {
       const pointerQuery = new Parse.Query("Party");
 
-      if(lastObjectId!==null) {
+      if(firstObjectId!==null) {
         const getLastQuery = new Parse.Query("Party")
-        const lastParty = await getLastQuery.get(lastObjectId)
-        pointerQuery.lessThan("createdAt", lastParty.get("createdAt"))
+        const lastParty = await getLastQuery.get(firstObjectId)
+        pointerQuery.greaterThan("createdAt", lastParty.get("createdAt"))
       }
 
       const query = Parse.Query.and(experienceQuery, reverseTypeQuery, reverseGenreQuery, levelQuery, statusQuery, dmQuery, playerQuery, pointerQuery)
@@ -619,6 +621,7 @@ class Party {
       if(partiesObjects.length<=limit) {
         const restOfParties = await first35(null, limit - partiesObjects.length)
         reachedEnd = restOfParties.reachedEnd;
+        console.log('[...restOfParties.parties, ...partiesObjects]: ', [...restOfParties.parties, ...partiesObjects]);
         return {parties: [...restOfParties.parties, ...partiesObjects], reachedEnd: reachedEnd};
       }
       else {
@@ -627,13 +630,13 @@ class Party {
       return {parties: partiesObjects, reachedEnd: reachedEnd};
     }
 
-    const first0 = async (lastObjectId, limit) => {
+    const first0 = async (firstObjectId, limit) => {
       const pointerQuery = new Parse.Query("Party");
 
-      if(lastObjectId!==null) {
+      if(firstObjectId!==null) {
         const getLastQuery = new Parse.Query("Party")
-        const lastParty = await getLastQuery.get(lastObjectId)
-        pointerQuery.lessThan("createdAt", lastParty.get("createdAt"))
+        const lastParty = await getLastQuery.get(firstObjectId)
+        pointerQuery.greaterThan("createdAt", lastParty.get("createdAt"))
       }
 
       const query = Parse.Query.and(experienceQuery, reverseTypeQuery, reverseGenreQuery, reverseLevelQuery, statusQuery, dmQuery, playerQuery, pointerQuery)
