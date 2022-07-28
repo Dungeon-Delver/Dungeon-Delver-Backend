@@ -273,7 +273,7 @@ class Party {
 
     const notification = new Parse.Object("Notification");
     notification.set("user", player)
-    notification.set("type", "remove")
+    notification.set("type", "delete")
     notification.set("sourceUser", dm)
     notification.set("party", party)
     await notification.save();
