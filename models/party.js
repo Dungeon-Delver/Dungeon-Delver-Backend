@@ -166,6 +166,14 @@ class Party {
     players.add(player);
 
     const partyPlayers = await party.save();
+
+    const notification = new Parse.Object("Notification");
+    notification.set("user", player)
+    notification.set("type", "accept")
+    notification.set("sourceUser", partyDm)
+    notification.set("party", party)
+    notification.save();
+    
     return partyPlayers;
   }
 
@@ -184,6 +192,14 @@ class Party {
     requestedUsers.remove(player)
 
     const partyPlayers = await party.save();
+
+    const notification = new Parse.Object("Notification");
+    notification.set("user", player)
+    notification.set("type", "reject")
+    notification.set("sourceUser", partyDm)
+    notification.set("party", party)
+    notification.save();
+
     return partyPlayers;    
   }
 
@@ -234,6 +250,7 @@ class Party {
     players.forEach((item) => {
         item.decrement("numParties", 1)
         item.save({}, {useMasterKey: true});
+
     })
     await partyDm.save({}, {useMasterKey: true});
     party.destroy();

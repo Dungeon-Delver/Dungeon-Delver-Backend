@@ -101,13 +101,16 @@ class User {
     const playerQuery = new Parse.Query("User")
     const player = await playerQuery.get(userId)
 
-    /*Will want to delete notification
-    const notification = new Parse.Object("Notification");
+    const notificationQuery = new Parse.Query("Notification");
     const dm = party.get("dm")
-    notification.set("user", dm)
-    notification.set("type", "joinRequest")
-    notification.set("sourceUser", player)
-    notification.save();*/
+    notificationQuery.equalTo("user", dm)
+    notificationQuery.equalTo("type", "joinRequest")
+    notificationQuery.equalTo("sourceUser", player)
+    notificationQuery.descending("createdAt")
+    const notification = await notificationQuery.first()
+    if(notification !== undefined) {
+      notification.destroy();
+    }
 
     let playersRequestedRelation = party.relation('playersRequested')
     playersRequestedRelation.remove(player)
@@ -125,14 +128,25 @@ class User {
     await Promise.all(notifications.map(async item => {
       const object = item.toJSON()
       if (object.hasOwnProperty("sourceUser")) {
-        const userQuery = new Parse.Query("User")
-        const sourceUser = await userQuery.get(object.sourceUser.objectId)
-        object.sourceUser = sourceUser.toJSON()
+        try {
+          const userQuery = new Parse.Query("User")
+          const sourceUser = await userQuery.get(object.sourceUser.objectId)
+          object.sourceUser = sourceUser.toJSON()
+        }
+        catch {
+          object.sourceUser = {user: "/Deleted User/", picture: "https://www.personality-insights.com/wp-content/uploads/2017/12/default-profile-pic-e1513291410505.jpg"}
+        }
+        
       }
       if(object.hasOwnProperty("party")) {
-        const partyQuery = new Parse.Query("Party")
-        const party = await partyQuery.get(object.party.objectId)
-        object.party = party.toJSON();
+        try {
+          const partyQuery = new Parse.Query("Party")
+          const party = await partyQuery.get(object.party.objectId)
+          object.party = party.toJSON();
+        }
+        catch {
+          object.party = {name: "/Deleted Party/"}
+        }
       }
       if(object.viewed) {
         readNotifications.push(object)
