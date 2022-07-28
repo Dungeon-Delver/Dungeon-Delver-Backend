@@ -258,7 +258,9 @@ class Party {
     notification.set("user", player)
     notification.set("type", "remove")
     notification.set("sourceUser", dm)
-    notification.save();
+    notification.set("party", party)
+    await notification.save();
+    const notificationJSON = notification.toJSON();
 
     player.decrement("numParties", 1);
     await player.save({}, {useMasterKey: true});
@@ -266,6 +268,7 @@ class Party {
     let playersRelation = party.relation('players')
     playersRelation.remove(player)
     party.save()
+    return notificationJSON
   }
 
   static async addChat(partyId, body) {

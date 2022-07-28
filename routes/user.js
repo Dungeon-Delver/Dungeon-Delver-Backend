@@ -90,4 +90,16 @@ router.post("/:userId/disable", async (req, res, next) => {
   }
 })
 
+router.get("/:userId/notifications", async (req, res, next) => {
+  try {
+    const userId = req.params.userId
+    const notifications = await User.getNotifications(userId)
+    res.status(200).json({ notifications })
+  }
+  catch(err) {
+    console.log(err)
+    next(err)
+  }
+})
+
 module.exports = router;

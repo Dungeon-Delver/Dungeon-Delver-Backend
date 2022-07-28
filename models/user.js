@@ -57,12 +57,14 @@ class User {
     notification.set("user", dm)
     notification.set("type", "joinRequest")
     notification.set("sourceUser", player)
+    notification.set("party", party)
     notification.save();
+    const notificationJSON = notification.toJSON();
 
     let playersRequestedRelation = party.relation('playersRequested')
     playersRequestedRelation.add(player)
     party.save()
-
+    return notificationJSON
   }
 
   static async partyLeave(userId, partyId) {
@@ -78,7 +80,9 @@ class User {
     notification.set("user", dm)
     notification.set("type", "leave")
     notification.set("sourceUser", player)
-    notification.save();
+    notification.set("party", party)
+    await notification.save();
+    const notificationJSON = notification.toJSON()
 
     player.decrement("numParties", 1);
     await player.save({}, {useMasterKey: true});
@@ -86,6 +90,7 @@ class User {
     let playersRelation = party.relation('players')
     playersRelation.remove(player)
     party.save()
+    return notificationJSON
   }
 
   static async cancelJoin(userId, partyId) {
@@ -107,6 +112,30 @@ class User {
     let playersRequestedRelation = party.relation('playersRequested')
     playersRequestedRelation.remove(player)
     party.save()
+  }
+
+  static async getNotifications(userId) {
+
+    const notificationQuery = new Parse.Query("Notification")
+    notificationQuery.equalTo("user", { '__type': 'Pointer', 'className': '_User', 'objectId': userId })
+    const notifications = await notificationQuery.find()
+    const notificationsJSON = await Promise.all(notifications.map(async item => {
+      const object = item.toJSON()
+      if (object.hasOwnProperty("sourceUser")) {
+        const userQuery = new Parse.Query("User")
+        const sourceUser = await userQuery.get(object.sourceUser.objectId)
+        object.sourceUser = sourceUser.toJSON()
+      }
+      if(object.hasOwnProperty("party")) {
+        const partyQuery = new Parse.Query("Party")
+        const party = await partyQuery.get(object.party.objectId)
+        object.party = party.toJSON();
+      }
+      return object;
+    }))
+    return notificationsJSON;
+
+    
   }
 }
 
