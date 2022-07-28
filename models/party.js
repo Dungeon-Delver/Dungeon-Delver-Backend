@@ -245,12 +245,20 @@ class Party {
     }
 
     partyDm.decrement("numParties", 1)
+    const dmNotifQuery = new Parse.Query("User")
+    const dmNotif = await dmNotifQuery.get(dm.objectId)
 
     const players = await party.get("players").query().find()
-    players.forEach((item) => {
+    players.forEach(async (item) => {
+        const notification = new Parse.Object("Notification")
+        notification.set("user", item)
+        notification.set("type", "delete")
+        notification.set("sourceUser", dmNotif)
+        notification.set("party", party)
+        await notification.save();
+        console.log(notification)
         item.decrement("numParties", 1)
-        item.save({}, {useMasterKey: true});
-
+        await item.save({}, {useMasterKey: true});
     })
     await partyDm.save({}, {useMasterKey: true});
     party.destroy();
