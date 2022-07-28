@@ -90,4 +90,17 @@ router.post("/:userId/disable", async (req, res, next) => {
   }
 })
 
+router.get("/:userId/in/party/:partyId", async (req, res, next) => {
+  try {
+    const userId = req.params.userId
+    const partyId = req.params.partyId
+    const inParty = await User.inParty(userId, partyId)
+    res.status(200).json({ inParty })
+  }
+  catch(err) {
+    console.log(err)
+    next(err)
+  }
+})
+
 module.exports = router;
