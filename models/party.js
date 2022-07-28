@@ -256,7 +256,6 @@ class Party {
         notification.set("sourceUser", dmNotif)
         notification.set("party", party)
         await notification.save();
-        console.log(notification)
         item.decrement("numParties", 1)
         await item.save({}, {useMasterKey: true});
     })
