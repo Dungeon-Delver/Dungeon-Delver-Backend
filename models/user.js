@@ -113,16 +113,19 @@ class User {
     const party = await query.get(partyId)
     const dmObj = await party.get("dm")
     const dmId = dmObj.id
+    let found = false;
     if(dmId === userId) {
+      found = true;
       return true;
     }
+   
     const players = await party.get("players").query().find()
     players.forEach(item => {
       if(item.id === userId) {
-        return true;
+        found = true;
       }
     })
-    return false;
+    return found;
   }
 }
 
