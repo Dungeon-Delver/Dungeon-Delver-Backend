@@ -43,8 +43,8 @@ router.post("/:partyId/join", async (req, res, next) => {
   try {
     const userId = req.body.userId.objectId
     const partyId = req.params.partyId;
-    await User.requestPartyJoin(userId, partyId)
-    res.status(201).json({})
+    const notification = await User.requestPartyJoin(userId, partyId)
+    res.status(201).json({notification})
   }
   catch(err) {
     console.log(err)
@@ -56,8 +56,8 @@ router.post("/:partyId/leave", async (req, res, next) => {
   try {
     const userId = req.body.userId.objectId
     const partyId = req.params.partyId;
-    await User.partyLeave(userId, partyId)
-    res.status(201).json({})
+    const notification = await User.partyLeave(userId, partyId)
+    res.status(201).json({notification})
   }
   catch(err) {
     console.log(err)

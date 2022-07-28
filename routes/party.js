@@ -80,8 +80,8 @@ router.post("/:partyId/accept/:userId", async (req, res, next) => {
         const partyId = req.params.partyId;
         const userId = req.params.userId
         const dm = req.body.dm
-        const users = await Party.acceptUser(partyId, userId, dm);
-        res.status(201).json({users})
+        const notification = await Party.acceptUser(partyId, userId, dm);
+        res.status(201).json({notification})
     }
     catch(err) {
         console.log(err)
@@ -94,8 +94,8 @@ router.post("/:partyId/reject/:userId", async (req, res, next) => {
         const partyId = req.params.partyId;
         const userId = req.params.userId
         const dm = req.body.dm
-        const users = await Party.rejectUser(partyId, userId, dm);
-        res.status(201).json({users})
+        const notification = await Party.rejectUser(partyId, userId, dm);
+        res.status(201).json({notification})
     }
     catch(err) {
         console.log(err)
@@ -108,8 +108,8 @@ router.post("/:partyId/remove/:userId", async (req, res, next) => {
     const dmId = req.body.dm.objectId
     const userId = req.params.userId
     const partyId = req.params.partyId;
-    await Party.partyRemove(dmId, userId, partyId)
-    res.status(201).json({})
+    const notification = await Party.partyRemove(dmId, userId, partyId)
+    res.status(201).json({notification})
   }
   catch(err) {
     console.log(err)
@@ -137,8 +137,8 @@ router.post("/:partyId/delete", async (req, res, next) => {
     try {
         const partyId = req.params.partyId;
         const dm = req.body.dm
-        await Party.deleteParty(partyId, dm)
-        res.status(201).json({})
+        const notifications = await Party.deleteParty(partyId, dm)
+        res.status(201).json({notifications})
     }
     catch(err) {
         console.log(err)

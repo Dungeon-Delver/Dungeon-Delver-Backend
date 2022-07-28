@@ -165,7 +165,7 @@ class Party {
     const players = party.get("players")
     players.add(player);
 
-    const partyPlayers = await party.save();
+    await party.save();
 
     const notification = new Parse.Object("Notification");
     notification.set("user", player)
@@ -173,8 +173,9 @@ class Party {
     notification.set("sourceUser", partyDm)
     notification.set("party", party)
     notification.save();
+    const notificationJSON = notification.toJSON()
     
-    return partyPlayers;
+    return notificationJSON
   }
 
   static async rejectUser(partyId, userId, dm) {
@@ -191,7 +192,7 @@ class Party {
     const requestedUsers = party.get("playersRequested");
     requestedUsers.remove(player)
 
-    const partyPlayers = await party.save();
+    await party.save();
 
     const notification = new Parse.Object("Notification");
     notification.set("user", player)
@@ -199,8 +200,9 @@ class Party {
     notification.set("sourceUser", partyDm)
     notification.set("party", party)
     notification.save();
+    const notificationJSON = notification.toJSON()
 
-    return partyPlayers;    
+    return notificationJSON
   }
 
   static async handleModifyParty(partyId, body) {
@@ -249,18 +251,21 @@ class Party {
     const dmNotif = await dmNotifQuery.get(dm.objectId)
 
     const players = await party.get("players").query().find()
-    players.forEach(async (item) => {
+    const notifications = players.forEach(async (item) => {
         const notification = new Parse.Object("Notification")
         notification.set("user", item)
         notification.set("type", "delete")
         notification.set("sourceUser", dmNotif)
         notification.set("party", party)
         await notification.save();
+        const notificationJSON = notification.toJSON();
         item.decrement("numParties", 1)
         await item.save({}, {useMasterKey: true});
+        return notificationJSON
     })
     await partyDm.save({}, {useMasterKey: true});
     party.destroy();
+    return notifications
   }
 
   static async partyRemove(dmId, userId, partyId) {
@@ -280,7 +285,7 @@ class Party {
 
     const notification = new Parse.Object("Notification");
     notification.set("user", player)
-    notification.set("type", "delete")
+    notification.set("type", "remove")
     notification.set("sourceUser", dm)
     notification.set("party", party)
     await notification.save();
