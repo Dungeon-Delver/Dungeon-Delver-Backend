@@ -118,8 +118,11 @@ class User {
 
     const notificationQuery = new Parse.Query("Notification")
     notificationQuery.equalTo("user", { '__type': 'Pointer', 'className': '_User', 'objectId': userId })
+    notificationQuery.descending("createdAt")
     const notifications = await notificationQuery.find()
-    const notificationsJSON = await Promise.all(notifications.map(async item => {
+    const unreadNotifications = []
+    const readNotifications = []
+    await Promise.all(notifications.map(async item => {
       const object = item.toJSON()
       if (object.hasOwnProperty("sourceUser")) {
         const userQuery = new Parse.Query("User")
@@ -131,9 +134,14 @@ class User {
         const party = await partyQuery.get(object.party.objectId)
         object.party = party.toJSON();
       }
-      return object;
+      if(object.viewed) {
+        readNotifications.push(object)
+      }
+      else {
+        unreadNotifications.push(object)
+      }
     }))
-    return notificationsJSON;
+    return {unreadNotifications: unreadNotifications, readNotifications: readNotifications};
 
     
   }
