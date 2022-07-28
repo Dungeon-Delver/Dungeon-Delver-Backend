@@ -65,6 +65,18 @@ router.post("/:partyId/leave", async (req, res, next) => {
   }
 })
 
+router.post("/read-notifications", async (req, res, next) => {
+  try {
+    const notifications = req.body.notifications
+    await User.readNotifications(notifications)
+    res.status(201).json({})
+  }
+  catch(err) {
+    console.log(err)
+    next(err)
+  }
+})
+
 router.post("/:partyId/cancel-join", async (req, res, next) => {
   try {
     const userId = req.body.userId.objectId

@@ -142,9 +142,18 @@ class User {
       }
     }))
     return {unreadNotifications: unreadNotifications, readNotifications: readNotifications};
-
-    
   }
+
+  static async readNotifications(notifications) {
+    notifications.forEach(async item => {
+      const notificationQuery = new Parse.Query("Notification")
+      const notification = await notificationQuery.get(item.objectId)
+      notification.set("viewed", true)
+      notification.save();
+    })
+    return;
+  }
+
 }
 
 module.exports = User
