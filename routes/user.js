@@ -102,10 +102,12 @@ router.post("/:userId/disable", async (req, res, next) => {
   }
 })
 
-router.get("/:userId/notifications", async (req, res, next) => {
+router.post("/:userId/notifications", async (req, res, next) => {
   try {
     const userId = req.params.userId
-    const notifications = await User.getNotifications(userId)
+    const first = req.body.first
+    const last = req.body.last
+    const notifications = await User.getNotifications(userId, first, last)
     res.status(200).json({ notifications })
   }
   catch(err) {
