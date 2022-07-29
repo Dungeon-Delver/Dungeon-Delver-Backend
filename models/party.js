@@ -167,13 +167,20 @@ class Party {
 
     await party.save();
 
+    const partyDmQuery = new Parse.Query("User")
+    const partyDmObject = await partyDmQuery.get(partyDm.id)
+
     const notification = new Parse.Object("Notification");
     notification.set("user", player)
     notification.set("type", "accept")
     notification.set("sourceUser", partyDm)
     notification.set("party", party)
-    notification.save();
+    await notification.save();
     const notificationJSON = notification.toJSON()
+    notificationJSON.sourceUser = partyDmObject.toJSON();
+    notificationJSON.party = party.toJSON()
+    notificationJSON.user = player.toJSON()
+    
     
     return notificationJSON
   }
@@ -192,6 +199,9 @@ class Party {
     const requestedUsers = party.get("playersRequested");
     requestedUsers.remove(player)
 
+    const partyDmQuery = new Parse.Query("User")
+    const partyDmObject = await partyDmQuery.get(partyDm.id)
+
     await party.save();
 
     const notification = new Parse.Object("Notification");
@@ -199,8 +209,11 @@ class Party {
     notification.set("type", "reject")
     notification.set("sourceUser", partyDm)
     notification.set("party", party)
-    notification.save();
+    await notification.save();
     const notificationJSON = notification.toJSON()
+    notificationJSON.sourceUser = partyDmObject.toJSON();
+    notificationJSON.party = party.toJSON()
+    notificationJSON.user = player.toJSON()
 
     return notificationJSON
   }
@@ -251,7 +264,7 @@ class Party {
     const dmNotif = await dmNotifQuery.get(dm.objectId)
 
     const players = await party.get("players").query().find()
-    const notifications = players.forEach(async (item) => {
+    const notifications = await Promise.all(players.map(async (item) => {
         const notification = new Parse.Object("Notification")
         notification.set("user", item)
         notification.set("type", "delete")
@@ -259,10 +272,14 @@ class Party {
         notification.set("party", party)
         await notification.save();
         const notificationJSON = notification.toJSON();
+        notificationJSON.sourceUser = dmNotif.toJSON();
+        notificationJSON.party = party.toJSON()
+        notificationJSON.user = item.toJSON()
+        notificationJSON.cancel = true;
         item.decrement("numParties", 1)
         await item.save({}, {useMasterKey: true});
         return notificationJSON
-    })
+    }))
     await partyDm.save({}, {useMasterKey: true});
     party.destroy();
     return notifications
@@ -290,6 +307,9 @@ class Party {
     notification.set("party", party)
     await notification.save();
     const notificationJSON = notification.toJSON();
+    notificationJSON.sourceUser = dm.toJSON();
+    notificationJSON.party = party.toJSON()
+    notificationJSON.user = player.toJSON()
 
     player.decrement("numParties", 1);
     await player.save({}, {useMasterKey: true});

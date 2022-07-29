@@ -81,8 +81,8 @@ router.post("/:partyId/cancel-join", async (req, res, next) => {
   try {
     const userId = req.body.userId.objectId
     const partyId = req.params.partyId;
-    await User.cancelJoin(userId, partyId)
-    res.status(201).json({})
+    const notification = await User.cancelJoin(userId, partyId)
+    res.status(201).json({notification})
   }
   catch(err) {
     console.log(err)

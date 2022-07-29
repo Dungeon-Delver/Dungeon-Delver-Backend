@@ -54,12 +54,17 @@ class User {
 
     const notification = new Parse.Object("Notification");
     const dm = party.get("dm")
+    const partyDmQuery = new Parse.Query("User")
+    const partyDmObject = await partyDmQuery.get(dm.id)
     notification.set("user", dm)
     notification.set("type", "joinRequest")
     notification.set("sourceUser", player)
     notification.set("party", party)
-    notification.save();
+    await notification.save();
     const notificationJSON = notification.toJSON();
+    notificationJSON.sourceUser = player.toJSON();
+    notificationJSON.party = party.toJSON()
+    notificationJSON.user = partyDmObject.toJSON()
 
     let playersRequestedRelation = party.relation('playersRequested')
     playersRequestedRelation.add(player)
@@ -75,14 +80,22 @@ class User {
     const playerQuery = new Parse.Query("User")
     const player = await playerQuery.get(userId)
 
+
     const notification = new Parse.Object("Notification");
     const dm = party.get("dm")
+
+    const partyDmQuery = new Parse.Query("User")
+    const partyDmObject = await partyDmQuery.get(dm.id)
+
     notification.set("user", dm)
     notification.set("type", "leave")
     notification.set("sourceUser", player)
     notification.set("party", party)
     await notification.save();
     const notificationJSON = notification.toJSON()
+    notificationJSON.sourceUser = player.toJSON();
+    notificationJSON.party = party.toJSON()
+    notificationJSON.user = partyDmObject.toJSON()
 
     player.decrement("numParties", 1);
     await player.save({}, {useMasterKey: true});
@@ -108,6 +121,7 @@ class User {
     notificationQuery.equalTo("sourceUser", player)
     notificationQuery.descending("createdAt")
     const notification = await notificationQuery.first()
+    const notificationJSON = notification.toJSON()
     if(notification !== undefined) {
       notification.destroy();
     }
@@ -115,6 +129,7 @@ class User {
     let playersRequestedRelation = party.relation('playersRequested')
     playersRequestedRelation.remove(player)
     party.save()
+    return notificationJSON
   }
 
   static async getNotifications(userId) {
@@ -122,6 +137,7 @@ class User {
     const notificationQuery = new Parse.Query("Notification")
     notificationQuery.equalTo("user", { '__type': 'Pointer', 'className': '_User', 'objectId': userId })
     notificationQuery.descending("createdAt")
+    notificationQuery.limit(5)
     const notifications = await notificationQuery.find()
     const unreadNotifications = []
     const readNotifications = []
