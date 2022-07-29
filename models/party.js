@@ -59,8 +59,6 @@ class Party {
   }
 
   static async handleSearchParty(searchParameters, userId, first, last) {
-    console.log('last: ', last);
-    console.log('first: ', first);
     
     const pageLimit = 2;
 
@@ -621,7 +619,6 @@ class Party {
       if(partiesObjects.length<=limit) {
         const restOfParties = await first35(null, limit - partiesObjects.length)
         reachedEnd = restOfParties.reachedEnd;
-        console.log('[...restOfParties.parties, ...partiesObjects]: ', [...restOfParties.parties, ...partiesObjects]);
         return {parties: [...restOfParties.parties, ...partiesObjects], reachedEnd: reachedEnd};
       }
       else {
