@@ -707,7 +707,7 @@ class Party {
 
     const userQuery = new Parse.Query("User")
     const user = await userQuery.get(userId)
-    const ascending = first !== null
+    const ascending = first === null
 
     
     const nameQuery = new Parse.Query("Party")
@@ -725,23 +725,19 @@ class Party {
     nameQuery.startsWith("name", partyName)
     
     if(first!==null) {
-      const tempQuery = new Parse.Query("Party")
-      const firstParty = await tempQuery.get(first.objectId)
-      firstQuery.greaterThan("createdAt", firstParty.get("createdAt"))
+      firstQuery.lessThan("name", first.name)
     }
     if(last!==null) {
-      const tempQuery = new Parse.Query("Party")
-      const lastParty = await tempQuery.get(last.objectId)
-      lastQuery.lessThan("createdAt", lastParty.get("createdAt"))
+      lastQuery.greaterThan("name", last.name)
     }
 
     const query = Parse.Query.and(nameQuery, statusQuery, dmQuery, playerQuery, firstQuery, lastQuery)
     query.limit(pageLimit+1);
     if(ascending) {
-      query.ascending("createdAt")
+      query.ascending("name")
     }
     else {
-      query.descending("createdAt")
+      query.descending("name")
     }
     const parties = await query.find();
 
