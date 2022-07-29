@@ -31,6 +31,7 @@ router.get("/:partyId", async (req, res, next) => {
 router.post("/search", async (req, res, next) => {
     try {
         const searchParameters = req.body.searchParameters;
+        const partyName = req.body.name
         var first = null;
         var last = null;
         if(req.body.hasOwnProperty("first")) {
@@ -40,7 +41,12 @@ router.post("/search", async (req, res, next) => {
             last = req.body.last;
         }
         const userId = req.body.user
-        const response = await Party.handleSearchParty(searchParameters, userId, first, last)
+        let response;
+        if(searchParameters)
+            response = await Party.handleSearchParty(searchParameters, userId, first, last)
+        else {
+            response = await Party.handleSearchPartyByName(partyName, userId, first, last)
+        }
         res.status(201).json({ response })
     }
     catch(err) {
