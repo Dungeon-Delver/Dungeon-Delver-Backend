@@ -123,6 +123,7 @@ class User {
     notificationQuery.descending("createdAt")
     const notification = await notificationQuery.first()
     const notificationJSON = notification.toJSON()
+    notificationJSON.cancel = true;
     if(notification !== undefined) {
       notification.destroy();
     }
