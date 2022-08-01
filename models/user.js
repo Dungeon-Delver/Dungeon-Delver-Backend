@@ -1,5 +1,6 @@
 const { BadRequestError } = require("../utils/errors")
 const Parse = require("../utils/initializeParse")
+const Party = require("./party")
 
 class User {
   static async listParties(userId) {
@@ -105,6 +106,26 @@ class User {
     let playersRequestedRelation = party.relation('playersRequested')
     playersRequestedRelation.remove(player)
     party.save()
+  }
+
+  static async inParty(userId, partyId) {
+    const query = new Parse.Query("Party")
+    const party = await query.get(partyId)
+    const dmObj = await party.get("dm")
+    const dmId = dmObj.id
+    let found = false;
+    if(dmId === userId) {
+      found = true;
+      return true;
+    }
+   
+    const players = await party.get("players").query().find()
+    players.forEach(item => {
+      if(item.id === userId) {
+        found = true;
+      }
+    })
+    return found;
   }
 }
 
