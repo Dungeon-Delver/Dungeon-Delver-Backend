@@ -33,9 +33,23 @@ router.get("/:partyId", async (req, res, next) => {
 router.post("/search", async (req, res, next) => {
     try {
         const searchParameters = req.body.searchParameters;
+        const partyName = req.body.name
+        var first = null;
+        var last = null;
+        if(req.body.hasOwnProperty("first")) {
+            first = req.body.first
+        }
+        else if(req.body.hasOwnProperty("last")) {
+            last = req.body.last;
+        }
         const userId = req.body.user
-        const parties = await Party.handleSearchParty(searchParameters, userId)
-        res.status(201).json({ parties })
+        let response;
+        if(searchParameters)
+            response = await Party.handleSearchParty(searchParameters, userId, first, last)
+        else {
+            response = await Party.handleSearchPartyByName(partyName, userId, first, last)
+        }
+        res.status(201).json({ response })
     }
     catch(err) {
         console.log(err)
@@ -72,8 +86,8 @@ router.post("/:partyId/accept/:userId", async (req, res, next) => {
         const partyId = req.params.partyId;
         const userId = req.params.userId
         const dm = req.body.dm
-        const users = await Party.acceptUser(partyId, userId, dm);
-        res.status(201).json({users})
+        const notification = await Party.acceptUser(partyId, userId, dm);
+        res.status(201).json({notification})
     }
     catch(err) {
         console.log(err)
@@ -86,8 +100,8 @@ router.post("/:partyId/reject/:userId", async (req, res, next) => {
         const partyId = req.params.partyId;
         const userId = req.params.userId
         const dm = req.body.dm
-        const users = await Party.rejectUser(partyId, userId, dm);
-        res.status(201).json({users})
+        const notification = await Party.rejectUser(partyId, userId, dm);
+        res.status(201).json({notification})
     }
     catch(err) {
         console.log(err)
@@ -100,8 +114,8 @@ router.post("/:partyId/remove/:userId", async (req, res, next) => {
     const dmId = req.body.dm.objectId
     const userId = req.params.userId
     const partyId = req.params.partyId;
-    await Party.partyRemove(dmId, userId, partyId)
-    res.status(201).json({})
+    const notification = await Party.partyRemove(dmId, userId, partyId)
+    res.status(201).json({notification})
   }
   catch(err) {
     console.log(err)
@@ -129,8 +143,8 @@ router.post("/:partyId/delete", async (req, res, next) => {
     try {
         const partyId = req.params.partyId;
         const dm = req.body.dm
-        await Party.deleteParty(partyId, dm)
-        res.status(201).json({})
+        const notifications = await Party.deleteParty(partyId, dm)
+        res.status(201).json({notifications})
     }
     catch(err) {
         console.log(err)
