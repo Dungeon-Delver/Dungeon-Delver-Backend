@@ -18,12 +18,15 @@ io.on("connect", (socket) => {
 
   // Listen for new messages
   socket.on(NEW_CHAT_MESSAGE_EVENT, async (data) => {
+    let date
     try {
-      await axios.post(`${BACKEND_URL}party/${data.partyId}/chat`, data)
+      response = await axios.post(`${BACKEND_URL}party/${data.partyId}/chat`, data)
+      date = response.data.date
     }
     catch (error) {
       console.error(error)
     }
+    data.createdAt = date;
     io.in(roomId).emit(NEW_CHAT_MESSAGE_EVENT, data);
   });
 

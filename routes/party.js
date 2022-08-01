@@ -156,8 +156,8 @@ router.post("/:partyId/chat", async (req, res, next) => {
     try {
         const body = req.body;
         const partyId = req.params.partyId
-        await Party.addChat(partyId, body)
-        res.status(201).json({})
+        const date = await Party.addChat(partyId, body)
+        res.status(201).json({date})
     }
     catch(err) {
         console.log(err)

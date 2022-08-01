@@ -969,7 +969,7 @@ class Party {
     messages.add(message);
     await party.save();
 
-    return;
+    return message.get("createdAt");
   }
 
   static async getMessages(partyId, body) {
