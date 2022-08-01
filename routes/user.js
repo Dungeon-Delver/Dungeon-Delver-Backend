@@ -43,8 +43,8 @@ router.post("/:partyId/join", async (req, res, next) => {
   try {
     const userId = req.body.userId.objectId
     const partyId = req.params.partyId;
-    await User.requestPartyJoin(userId, partyId)
-    res.status(201).json({})
+    const notification = await User.requestPartyJoin(userId, partyId)
+    res.status(201).json({notification})
   }
   catch(err) {
     console.log(err)
@@ -56,7 +56,19 @@ router.post("/:partyId/leave", async (req, res, next) => {
   try {
     const userId = req.body.userId.objectId
     const partyId = req.params.partyId;
-    await User.partyLeave(userId, partyId)
+    const notification = await User.partyLeave(userId, partyId)
+    res.status(201).json({notification})
+  }
+  catch(err) {
+    console.log(err)
+    next(err)
+  }
+})
+
+router.post("/read-notifications", async (req, res, next) => {
+  try {
+    const notifications = req.body.notifications
+    await User.readNotifications(notifications)
     res.status(201).json({})
   }
   catch(err) {
@@ -69,8 +81,8 @@ router.post("/:partyId/cancel-join", async (req, res, next) => {
   try {
     const userId = req.body.userId.objectId
     const partyId = req.params.partyId;
-    await User.cancelJoin(userId, partyId)
-    res.status(201).json({})
+    const notification = await User.cancelJoin(userId, partyId)
+    res.status(201).json({notification})
   }
   catch(err) {
     console.log(err)
@@ -90,10 +102,12 @@ router.post("/:userId/disable", async (req, res, next) => {
   }
 })
 
-router.get("/:userId/notifications", async (req, res, next) => {
+router.post("/:userId/notifications", async (req, res, next) => {
   try {
     const userId = req.params.userId
-    const notifications = await User.getNotifications(userId)
+    const first = req.body.first
+    const last = req.body.last
+    const notifications = await User.getNotifications(userId, first, last)
     res.status(200).json({ notifications })
   }
   catch(err) {
