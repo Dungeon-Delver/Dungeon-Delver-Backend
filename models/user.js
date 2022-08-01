@@ -132,17 +132,48 @@ class User {
     return notificationJSON
   }
 
-  static async getNotifications(userId) {
+  static async getNotifications(userId, first, last) {
+    const pageLimit = 5;
 
     const notificationQuery = new Parse.Query("Notification")
     notificationQuery.equalTo("user", { '__type': 'Pointer', 'className': '_User', 'objectId': userId })
-    notificationQuery.descending("createdAt")
-    notificationQuery.limit(5)
+    const ascending = first !== undefined
+    if(ascending) {
+      notificationQuery.ascending("createdAt")
+    }
+    else {
+      notificationQuery.descending("createdAt")
+    }
+
+    if(first!==undefined) {
+      const firstQuery = new Parse.Query("Notification")
+      const firstNotif = await firstQuery.get(first.objectId)
+      notificationQuery.greaterThan("createdAt", firstNotif.get("createdAt"))
+    }
+    if(last!==undefined) {
+      const firstQuery = new Parse.Query("Notification")
+      const lastNotif = await firstQuery.get(last.objectId)
+      notificationQuery.lessThan("createdAt", lastNotif.get("createdAt"))
+    }
+    notificationQuery.limit(pageLimit+1)
     const notifications = await notificationQuery.find()
+    var reachedEnd = false
+    if(notifications.length <= pageLimit) {
+      reachedEnd = true;
+    }
+    else {
+      notifications.splice(pageLimit)
+    }
     const unreadNotifications = []
     const readNotifications = []
-    await Promise.all(notifications.map(async item => {
+    
+    if(ascending) {
+      notifications.reverse()
+    }
+    for(let i = 0; i < notifications.length; i++) {
+      const item = notifications[i]
       const object = item.toJSON()
+
       if (object.hasOwnProperty("sourceUser")) {
         try {
           const userQuery = new Parse.Query("User")
@@ -170,8 +201,8 @@ class User {
       else {
         unreadNotifications.push(object)
       }
-    }))
-    return {unreadNotifications: unreadNotifications, readNotifications: readNotifications};
+    }
+    return {unreadNotifications: unreadNotifications, readNotifications: readNotifications, reachedEnd: reachedEnd};
   }
 
   static async readNotifications(notifications) {
