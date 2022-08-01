@@ -979,9 +979,10 @@ class Party {
         const userQuery = new Parse.Query("User")
         const messageUser = await userQuery.get(userId)
         const message =  item.get("message")
+        const date = item.get("createdAt")
         const name = messageUser.get("username")
         const picture = messageUser.get("picture")
-        return {objectId: item.id, senderId: userId, user: {username: name, picture: picture}, body: message, ownedByCurrentUser: body.userId === userId}
+        return {objectId: item.id, senderId: userId, user: {username: name, picture: picture}, createdAt: date, body: message, ownedByCurrentUser: body.userId === userId}
     }))
     return newMessages
   }
