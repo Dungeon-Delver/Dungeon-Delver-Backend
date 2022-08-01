@@ -909,7 +909,6 @@ class Party {
         notificationJSON.sourceUser = dmNotif.toJSON();
         notificationJSON.party = party.toJSON()
         notificationJSON.user = item.toJSON()
-        notificationJSON.cancel = true;
         item.decrement("numParties", 1)
         await item.save({}, {useMasterKey: true});
         return notificationJSON
