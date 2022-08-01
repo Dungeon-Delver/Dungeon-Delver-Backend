@@ -418,7 +418,7 @@ class Party {
         return {parties: partiesObjects, reachedEnd: reachedEnd};
       }
       else {
-        partiesObjects.splice(limit)
+        partiesObjects.splice(0, 1)
       }
       return {parties: partiesObjects, reachedEnd: reachedEnd};
     }
@@ -452,7 +452,7 @@ class Party {
         return {parties: [...restOfParties.parties, ...partiesObjects], reachedEnd: reachedEnd};
       }
       else {
-        partiesObjects.splice(limit)
+        partiesObjects.splice(0, 1)
       }
       return {parties: partiesObjects, reachedEnd: reachedEnd};
     }
@@ -486,7 +486,7 @@ class Party {
         return {parties: [...restOfParties.parties, ...partiesObjects], reachedEnd: reachedEnd};
       }
       else {
-        partiesObjects.splice(limit)
+        partiesObjects.splice(0, 1)
       }
       return {parties: partiesObjects, reachedEnd: reachedEnd};
     }
@@ -520,7 +520,7 @@ class Party {
         return {parties: [...restOfParties.parties, ...partiesObjects], reachedEnd: reachedEnd};
       }
       else {
-        partiesObjects.splice(limit)
+        partiesObjects.splice(0, 1)
       }
       return {parties: partiesObjects, reachedEnd: reachedEnd};
     }
@@ -554,7 +554,7 @@ class Party {
         return {parties: [...restOfParties.parties, ...partiesObjects], reachedEnd: reachedEnd};
       }
       else {
-        partiesObjects.splice(limit)
+        partiesObjects.splice(0, 1)
       }
       return {parties: partiesObjects, reachedEnd: reachedEnd};
     }
@@ -572,6 +572,7 @@ class Party {
       query.ascending("createdAt")
       query.limit(limit+1);
       const parties = await query.find();
+      console.log('parties: ', parties);
 
       const partiesObjects = parties.map(item => {
         return item.toJSON();
@@ -582,13 +583,14 @@ class Party {
         item.relevance = 35
       })
       partiesObjects.reverse();
+      console.log('partiesObjects: ', partiesObjects);
       if(partiesObjects.length<=limit) {
         const restOfParties = await first40(null, limit - partiesObjects.length)
         reachedEnd = restOfParties.reachedEnd;
         return {parties: [...restOfParties.parties, ...partiesObjects], reachedEnd: reachedEnd};
       }
       else {
-        partiesObjects.splice(limit)
+        partiesObjects.splice(0, 1)
       }
       return {parties: partiesObjects, reachedEnd: reachedEnd};
     }
@@ -622,7 +624,7 @@ class Party {
         return {parties: [...restOfParties.parties, ...partiesObjects], reachedEnd: reachedEnd};
       }
       else {
-        partiesObjects.splice(limit)
+        partiesObjects.splice(0, 1)
       }
       return {parties: partiesObjects, reachedEnd: reachedEnd};
     }
@@ -656,7 +658,7 @@ class Party {
         return {parties: [...restOfParties.parties, ...partiesObjects], reachedEnd: reachedEnd};
       }
       else {
-        partiesObjects.splice(limit)
+        partiesObjects.splice(0, 1)
       }
       return {parties: partiesObjects, reachedEnd: reachedEnd};
     }
