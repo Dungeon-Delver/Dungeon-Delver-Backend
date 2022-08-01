@@ -54,12 +54,17 @@ class User {
 
     const notification = new Parse.Object("Notification");
     const dm = party.get("dm")
+    const partyDmQuery = new Parse.Query("User")
+    const partyDmObject = await partyDmQuery.get(dm.id)
     notification.set("user", dm)
     notification.set("type", "joinRequest")
     notification.set("sourceUser", player)
     notification.set("party", party)
-    notification.save();
+    await notification.save();
     const notificationJSON = notification.toJSON();
+    notificationJSON.sourceUser = player.toJSON();
+    notificationJSON.party = party.toJSON()
+    notificationJSON.user = partyDmObject.toJSON()
 
     let playersRequestedRelation = party.relation('playersRequested')
     playersRequestedRelation.add(player)
@@ -75,14 +80,22 @@ class User {
     const playerQuery = new Parse.Query("User")
     const player = await playerQuery.get(userId)
 
+
     const notification = new Parse.Object("Notification");
     const dm = party.get("dm")
+
+    const partyDmQuery = new Parse.Query("User")
+    const partyDmObject = await partyDmQuery.get(dm.id)
+
     notification.set("user", dm)
     notification.set("type", "leave")
     notification.set("sourceUser", player)
     notification.set("party", party)
     await notification.save();
     const notificationJSON = notification.toJSON()
+    notificationJSON.sourceUser = player.toJSON();
+    notificationJSON.party = party.toJSON()
+    notificationJSON.user = partyDmObject.toJSON()
 
     player.decrement("numParties", 1);
     await player.save({}, {useMasterKey: true});
@@ -108,6 +121,7 @@ class User {
     notificationQuery.equalTo("sourceUser", player)
     notificationQuery.descending("createdAt")
     const notification = await notificationQuery.first()
+    const notificationJSON = notification.toJSON()
     if(notification !== undefined) {
       notification.destroy();
     }
@@ -115,18 +129,51 @@ class User {
     let playersRequestedRelation = party.relation('playersRequested')
     playersRequestedRelation.remove(player)
     party.save()
+    return notificationJSON
   }
 
-  static async getNotifications(userId) {
+  static async getNotifications(userId, first, last) {
+    const pageLimit = 5;
 
     const notificationQuery = new Parse.Query("Notification")
     notificationQuery.equalTo("user", { '__type': 'Pointer', 'className': '_User', 'objectId': userId })
-    notificationQuery.descending("createdAt")
+    const ascending = first !== undefined
+    if(ascending) {
+      notificationQuery.ascending("createdAt")
+    }
+    else {
+      notificationQuery.descending("createdAt")
+    }
+
+    if(first!==undefined) {
+      const firstQuery = new Parse.Query("Notification")
+      const firstNotif = await firstQuery.get(first.objectId)
+      notificationQuery.greaterThan("createdAt", firstNotif.get("createdAt"))
+    }
+    if(last!==undefined) {
+      const firstQuery = new Parse.Query("Notification")
+      const lastNotif = await firstQuery.get(last.objectId)
+      notificationQuery.lessThan("createdAt", lastNotif.get("createdAt"))
+    }
+    notificationQuery.limit(pageLimit+1)
     const notifications = await notificationQuery.find()
+    var reachedEnd = false
+    if(notifications.length <= pageLimit) {
+      reachedEnd = true;
+    }
+    else {
+      notifications.splice(pageLimit)
+    }
     const unreadNotifications = []
     const readNotifications = []
-    await Promise.all(notifications.map(async item => {
+    
+    if(ascending) {
+      notifications.reverse()
+    }
+    for(let i = 0; i < notifications.length; i++) {
+      const item = notifications[i]
       const object = item.toJSON()
+
       if (object.hasOwnProperty("sourceUser")) {
         try {
           const userQuery = new Parse.Query("User")
@@ -154,8 +201,8 @@ class User {
       else {
         unreadNotifications.push(object)
       }
-    }))
-    return {unreadNotifications: unreadNotifications, readNotifications: readNotifications};
+    }
+    return {unreadNotifications: unreadNotifications, readNotifications: readNotifications, reachedEnd: reachedEnd};
   }
 
   static async readNotifications(notifications) {
