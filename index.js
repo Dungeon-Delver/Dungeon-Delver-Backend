@@ -1,5 +1,5 @@
 const app = require("./app")
-const chatApp = require("./chatApp")
+const chatApp = require("./socketServer")
 
 const appPort = process.env.PORT || 3001
 const chatPort = 3002

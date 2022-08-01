@@ -1,5 +1,5 @@
 const axios = require('axios');
-const BACKEND_SERVER = "http://localhost:3001/"
+const {BACKEND_URL} = require('./constants.js')
 const app = require("http").createServer();
 const io = require("socket.io")(app, {
   cors: {
@@ -8,8 +8,9 @@ const io = require("socket.io")(app, {
 });
 
 const NEW_CHAT_MESSAGE_EVENT = "newChatMessage";
+const NEW_NOTIFICATION_EVENT = 'newNotification'
 
-io.on("connection", (socket) => {
+io.on("connect", (socket) => {
   
   // Join a conversation
   const { roomId } = socket.handshake.query;
@@ -18,14 +19,17 @@ io.on("connection", (socket) => {
   // Listen for new messages
   socket.on(NEW_CHAT_MESSAGE_EVENT, async (data) => {
     try {
-      await axios.post(`${BACKEND_SERVER}party/${data.partyId}/chat`, data)
+      await axios.post(`${BACKEND_URL}party/${data.partyId}/chat`, data)
     }
     catch (error) {
       console.error(error)
     }
-    
     io.in(roomId).emit(NEW_CHAT_MESSAGE_EVENT, data);
   });
+
+  socket.on(NEW_NOTIFICATION_EVENT, async (data) => {
+    io.in(roomId).emit(NEW_NOTIFICATION_EVENT, data)
+  })
 
   // Leave the room if the user closes the socket
   socket.on("disconnect", () => {
