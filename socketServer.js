@@ -10,7 +10,7 @@ const io = require("socket.io")(app, {
 const NEW_CHAT_MESSAGE_EVENT = "newChatMessage";
 const NEW_NOTIFICATION_EVENT = 'newNotification'
 
-io.on("connection", (socket) => {
+io.on("connect", (socket) => {
   
   // Join a conversation
   const { roomId } = socket.handshake.query;
@@ -24,12 +24,11 @@ io.on("connection", (socket) => {
     catch (error) {
       console.error(error)
     }
-    
     io.in(roomId).emit(NEW_CHAT_MESSAGE_EVENT, data);
   });
 
   socket.on(NEW_NOTIFICATION_EVENT, async (data) => {
-    
+    io.in(roomId).emit(NEW_NOTIFICATION_EVENT, data)
   })
 
   // Leave the room if the user closes the socket
