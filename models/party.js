@@ -700,13 +700,67 @@ class Party {
       }
     }
     return await firstRequest()
-
-    
-
-    
-
-    
   }
+
+  static async handleSearchPartyByName (partyName, userId, first, last) {
+    const pageLimit = 2;
+
+    const userQuery = new Parse.Query("User")
+    const user = await userQuery.get(userId)
+    const ascending = first === null
+
+    
+    const nameQuery = new Parse.Query("Party")
+    const statusQuery = new Parse.Query("Party")
+    const dmQuery = new Parse.Query("Party");
+    const findPlayerParties = new Parse.Query("Party")
+    const playerQuery = new Parse.Query("Party")
+    const firstQuery = new Parse.Query("Party")
+    const lastQuery = new Parse.Query("Party")
+
+    statusQuery.notEqualTo("status", "Closed")
+    dmQuery.notEqualTo("dm", { '__type': 'Pointer', 'className': '_User', 'objectId': userId })
+    findPlayerParties.equalTo("players", user)
+    playerQuery.doesNotMatchKeyInQuery("objectId", "objectId", findPlayerParties)
+    nameQuery.startsWith("name", partyName)
+    
+    if(first!==null) {
+      firstQuery.lessThan("name", first.name)
+    }
+    if(last!==null) {
+      lastQuery.greaterThan("name", last.name)
+    }
+
+    const query = Parse.Query.and(nameQuery, statusQuery, dmQuery, playerQuery, firstQuery, lastQuery)
+    query.limit(pageLimit+1);
+    if(ascending) {
+      query.ascending("name")
+    }
+    else {
+      query.descending("name")
+    }
+    const parties = await query.find();
+
+    const partiesObjects = parties.map(item => {
+      return item.toJSON();
+    })
+
+    var reachedEnd = false;
+    if(partiesObjects.length<=pageLimit) {
+      reachedEnd = true;
+    }
+    else {
+      partiesObjects.splice(pageLimit)
+    }
+
+    if(first!==null) {
+      partiesObjects.reverse();
+    }
+
+    return {parties: partiesObjects, reachedEnd: reachedEnd};
+  }
+
+
 
   static async getMembers(partyId) {
     const query = new Parse.Query("Party")
