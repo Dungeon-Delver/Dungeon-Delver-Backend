@@ -5,6 +5,7 @@ const User = require("./user")
 
 class Party {
   static async handleCreateParty(body) {
+    console.log('body: ', body);
     const bodyProps = ["name", "dm", "searchParameters", "mode"]
     bodyProps.forEach((item) => {
       if(!body.hasOwnProperty(item)) {
@@ -17,6 +18,7 @@ class Party {
         throw new BadRequestError("Missing Search Parameters")
       }
     })
+
     const newParty = new Parse.Object("Party");
     newParty.set("name", body.name)
     const query = new Parse.Query("User");
@@ -33,6 +35,10 @@ class Party {
     newParty.set("dm", dm)
     newParty.set("searchParameters", body.searchParameters)
     newParty.set("status", body.mode)
+    if(body.hasOwnProperty("image")) {
+      newParty.set("image", body.image)
+    }
+
     let result = await newParty.save()
     return result.id;
   }
