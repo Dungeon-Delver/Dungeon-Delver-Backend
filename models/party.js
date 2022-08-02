@@ -691,7 +691,7 @@ class Party {
         return await first65(first.objectId, pageLimit);
       if(first.relevance === 60)
         return await first60(first.objectId, pageLimit);
-      if(first.relevance === 45)
+      if(first.relevance === 40)
         return await first40(first.objectId, pageLimit);
       if(first.relevance === 35)
         return await first35(first.objectId, pageLimit);
