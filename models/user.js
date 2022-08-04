@@ -252,7 +252,13 @@ class User {
   }
 
   const userQuery = new Parse.Query("User")
-  const user = await userQuery.get(userId)
+  var user
+  try {
+    user = await userQuery.get(userId)
+  }
+  catch {
+    throw new NotFoundError("This user does not exist")
+  }
   const userJSON = user.toJSON()
 
   const dmQuery = new Parse.Query("Party");
