@@ -884,6 +884,9 @@ class Party {
     }
     party.set("searchParameters", body.searchParameters)
     party.set("status", body.mode)
+    if(body.hasOwnProperty("image")) {
+      party.set("image", body.image)
+    }
     let result = await party.save()
     return result.id;
   }
