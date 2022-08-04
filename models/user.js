@@ -1,4 +1,4 @@
-const { BadRequestError } = require("../utils/errors")
+const { BadRequestError, NotFoundError } = require("../utils/errors")
 const Parse = require("../utils/initializeParse")
 const Party = require("./party")
 
@@ -41,7 +41,7 @@ class User {
       return user
     }
     catch (err) {
-      throw new BadRequestError("Invalid user id")
+      throw new NotFoundError("Invalid user id")
     }
   }
 
@@ -236,6 +236,49 @@ class User {
       notification.save();
     })
     return;
+  }
+
+  static async getProfileData(userId) {
+    const getMembers = async (parties) => {
+      const newParties = await Promise.all(parties.map( async item => {
+      const dmObj = await item.get("dm")
+      const dmId = dmObj.id
+      const dmQuery = new Parse.Query("User")
+      const dm = await dmQuery.get(dmId)
+      const players = await item.get("players").query().find()
+      return {party: item, dm: dm, players: players};
+    }))
+    return newParties
+  }
+
+  const userQuery = new Parse.Query("User")
+  const user = await userQuery.get(userId)
+  const userJSON = user.toJSON()
+
+  const dmQuery = new Parse.Query("Party");
+  const statusQuery = new Parse.Query("Party")
+
+  statusQuery.equalTo("status", "Public")
+  dmQuery.equalTo("dm", { '__type': 'Pointer', 'className': '_User', 'objectId': userId });
+
+  const finalDmQuery = Parse.Query.and(dmQuery, statusQuery)
+  finalDmQuery.descending('createdAt')
+
+  const dmParties = await finalDmQuery.find()
+
+  const dmPartiesRet =  await getMembers(dmParties)
+
+  const playerQuery = new Parse.Query("Party");
+  playerQuery.equalTo("players", user)
+  const translationPlayerQuery = new Parse.Query("Party")
+  translationPlayerQuery.matchesKeyInQuery("objectId", "objectId", playerQuery)
+  const finalPlayerQuery = Parse.Query.and(translationPlayerQuery, statusQuery)
+  finalPlayerQuery.descending('createdAt')
+
+  const playerParties = await finalPlayerQuery.find()
+  const playerPartiesRet = await getMembers(playerParties)
+
+  return {user: userJSON, parties: {dmParties: dmPartiesRet, playerParties: playerPartiesRet}};
   }
 
 }

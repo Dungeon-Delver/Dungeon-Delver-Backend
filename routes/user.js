@@ -130,4 +130,16 @@ router.post("/:userId/notifications", async (req, res, next) => {
   }
 })
 
+router.get("/:userId/profile", async (req, res, next) => {
+  try {
+    const userId = req.params.userId
+    const data = await User.getProfileData(userId)
+    res.status(200).json({ data })
+  }
+  catch(err) {
+    console.log(err)
+    next(err)
+  }
+})
+
 module.exports = router;
