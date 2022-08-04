@@ -5,7 +5,6 @@ const User = require("./user")
 
 class Party {
   static async handleCreateParty(body) {
-    console.log('body: ', body);
     const bodyProps = ["name", "dm", "searchParameters", "mode"]
     bodyProps.forEach((item) => {
       if(!body.hasOwnProperty(item)) {
@@ -578,7 +577,6 @@ class Party {
       query.ascending("createdAt")
       query.limit(limit+1);
       const parties = await query.find();
-      console.log('parties: ', parties);
 
       const partiesObjects = parties.map(item => {
         return item.toJSON();
@@ -589,7 +587,6 @@ class Party {
         item.relevance = 35
       })
       partiesObjects.reverse();
-      console.log('partiesObjects: ', partiesObjects);
       if(partiesObjects.length<=limit) {
         const restOfParties = await first40(null, limit - partiesObjects.length)
         reachedEnd = restOfParties.reachedEnd;
