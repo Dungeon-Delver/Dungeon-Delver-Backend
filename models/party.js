@@ -17,6 +17,7 @@ class Party {
         throw new BadRequestError("Missing Search Parameters")
       }
     })
+
     const newParty = new Parse.Object("Party");
     newParty.set("name", body.name)
     const query = new Parse.Query("User");
@@ -33,6 +34,10 @@ class Party {
     newParty.set("dm", dm)
     newParty.set("searchParameters", body.searchParameters)
     newParty.set("status", body.mode)
+    if(body.hasOwnProperty("image")) {
+      newParty.set("image", body.image)
+    }
+
     let result = await newParty.save()
     return result.id;
   }
@@ -572,7 +577,6 @@ class Party {
       query.ascending("createdAt")
       query.limit(limit+1);
       const parties = await query.find();
-      console.log('parties: ', parties);
 
       const partiesObjects = parties.map(item => {
         return item.toJSON();
@@ -583,7 +587,6 @@ class Party {
         item.relevance = 35
       })
       partiesObjects.reverse();
-      console.log('partiesObjects: ', partiesObjects);
       if(partiesObjects.length<=limit) {
         const restOfParties = await first40(null, limit - partiesObjects.length)
         reachedEnd = restOfParties.reachedEnd;
@@ -881,6 +884,9 @@ class Party {
     }
     party.set("searchParameters", body.searchParameters)
     party.set("status", body.mode)
+    if(body.hasOwnProperty("image")) {
+      party.set("image", body.image)
+    }
     let result = await party.save()
     return result.id;
   }
