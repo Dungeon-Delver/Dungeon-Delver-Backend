@@ -1023,7 +1023,8 @@ class Party {
     }
     let sender;
     try {
-      sender = await User.getUser(body.senderId)
+     const userQuery = new Parse.Query("User")
+     sender = await userQuery.get(body.senderId)
     }
     catch {
       throw new NotFoundError(`Invalid senderId ${body.senderId}`)
