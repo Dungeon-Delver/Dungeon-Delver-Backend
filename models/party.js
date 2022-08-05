@@ -21,13 +21,13 @@ class Party {
 
     const newParty = new Parse.Object("Party");
     newParty.set("name", body.name)
-    var dm
+    let dm
     try {
       const query = new Parse.Query("User");
       dm = await query.get(body.dm.objectId);
     }
     catch {
-      throw new NotFoundError("Invalid userId")
+      throw new NotFoundError(`Invalid userId ${body.dm.objectId}`)
     }
     
     if(!dm.get("enabled")) {
@@ -60,18 +60,18 @@ class Party {
         return {party: party, requestedUsers: requestedUsers, members: members};
       }
       catch {
-        throw new NotFoundError("Invalid partyId")
+        throw new NotFoundError(`Invalid partyId ${partyId}`)
       }
   }
 
   static async getRequestedUsers(partyId) {
-    var party
+    let party
     try {
       const query = new Parse.Query("Party")
       party = await query.get(partyId)
     }
     catch {
-      throw new NotFoundError("Invalid partyId")
+      throw new NotFoundError(`Invalid partyId ${partyId}`)
     }
     const users = await party.get("playersRequested").query().find()
     return users;
@@ -80,19 +80,21 @@ class Party {
   static async handleSearchParty(searchParameters, userId, first, last) {
     
     const pageLimit = 2;
-    var user
+    let user
     const dmQuery = new Parse.Query("Party");
     const playerQuery = new Parse.Query("Party")
 
-    try {
-      const userQuery = new Parse.Query("User")
-      user = await userQuery.get(userId)
-      dmQuery.notEqualTo("dm", { '__type': 'Pointer', 'className': '_User', 'objectId': userId })
-      findPlayerParties.equalTo("players", user)
-      playerQuery.doesNotMatchKeyInQuery("objectId", "objectId", findPlayerParties)
-    }
-    catch {
-      
+    if(userId!==undefined) {
+      try {
+        const userQuery = new Parse.Query("User")
+        user = await userQuery.get(userId)
+        dmQuery.notEqualTo("dm", { '__type': 'Pointer', 'className': '_User', 'objectId': userId })
+        findPlayerParties.equalTo("players", user)
+        playerQuery.doesNotMatchKeyInQuery("objectId", "objectId", findPlayerParties)
+      }
+      catch {
+        throw new NotFoundError(`Invalid userId ${userId}`)
+      }
     }
     
 
@@ -135,7 +137,7 @@ class Party {
         return item.toJSON();
       })
 
-      var reachedEnd = false;
+      let reachedEnd = false;
       partiesObjects.forEach((item) => {
         item.relevance = 100
       })
@@ -173,7 +175,7 @@ class Party {
         return item.toJSON();
       })
 
-      var reachedEnd = false;
+      let reachedEnd = false;
       partiesObjects.forEach((item) => {
         item.relevance = 100
       })
@@ -206,7 +208,7 @@ class Party {
         return item.toJSON();
       })
 
-      var reachedEnd = false;
+      let reachedEnd = false;
       partiesObjects.forEach((item) => {
         item.relevance = 75
       })
@@ -239,7 +241,7 @@ class Party {
         return item.toJSON();
       })
 
-      var reachedEnd = false;
+      let reachedEnd = false;
       partiesObjects.forEach((item) => {
         item.relevance = 65
       })
@@ -272,7 +274,7 @@ class Party {
         return item.toJSON();
       })
 
-      var reachedEnd = false;
+      let reachedEnd = false;
       partiesObjects.forEach((item) => {
         item.relevance = 60
       })
@@ -305,7 +307,7 @@ class Party {
         return item.toJSON();
       })
 
-      var reachedEnd = false;
+      let reachedEnd = false;
       partiesObjects.forEach((item) => {
         item.relevance = 40
       })
@@ -338,7 +340,7 @@ class Party {
         return item.toJSON();
       })
 
-      var reachedEnd = false;
+      let reachedEnd = false;
       partiesObjects.forEach((item) => {
         item.relevance = 35
       })
@@ -371,7 +373,7 @@ class Party {
         return item.toJSON();
       })
 
-      var reachedEnd = false;
+      let reachedEnd = false;
       partiesObjects.forEach((item) => {
         item.relevance = 25
       })
@@ -404,7 +406,7 @@ class Party {
         return item.toJSON();
       })
 
-      var reachedEnd = false;
+      let reachedEnd = false;
       partiesObjects.forEach((item) => {
         item.relevance = 0
       })
@@ -436,7 +438,7 @@ class Party {
         return item.toJSON();
       })
 
-      var reachedEnd = false;
+      let reachedEnd = false;
       partiesObjects.forEach((item) => {
         item.relevance = 100
       })
@@ -469,7 +471,7 @@ class Party {
         return item.toJSON();
       })
 
-      var reachedEnd = false;
+      let reachedEnd = false;
       partiesObjects.forEach((item) => {
         item.relevance = 75
       })
@@ -503,7 +505,7 @@ class Party {
         return item.toJSON();
       })
 
-      var reachedEnd = false;
+      let reachedEnd = false;
       partiesObjects.forEach((item) => {
         item.relevance = 65
       })
@@ -537,7 +539,7 @@ class Party {
         return item.toJSON();
       })
 
-      var reachedEnd = false;
+      let reachedEnd = false;
       partiesObjects.forEach((item) => {
         item.relevance = 60
       })
@@ -571,7 +573,7 @@ class Party {
         return item.toJSON();
       })
 
-      var reachedEnd = false;
+      let reachedEnd = false;
       partiesObjects.forEach((item) => {
         item.relevance = 40
       })
@@ -606,7 +608,7 @@ class Party {
         return item.toJSON();
       })
 
-      var reachedEnd = false;
+      let reachedEnd = false;
       partiesObjects.forEach((item) => {
         item.relevance = 35
       })
@@ -641,7 +643,7 @@ class Party {
         return item.toJSON();
       })
 
-      var reachedEnd = false;
+      let reachedEnd = false;
       partiesObjects.forEach((item) => {
         item.relevance = 25
       })
@@ -675,7 +677,7 @@ class Party {
         return item.toJSON();
       })
 
-      var reachedEnd = false;
+      let reachedEnd = false;
       partiesObjects.forEach((item) => {
         item.relevance = 0
       })
@@ -775,7 +777,7 @@ class Party {
       return item.toJSON();
     })
 
-    var reachedEnd = false;
+    let reachedEnd = false;
     if(partiesObjects.length<=pageLimit) {
       reachedEnd = true;
     }
@@ -893,13 +895,13 @@ class Party {
         throw new BadRequestError("Missing Search Parameters")
       }
     })
-    var party;
+    let party;
     try {
       const partyQuery = new Parse.Query("Party")
       party = await partyQuery.get(partyId)
     }
     catch {
-      throw new NotFoundError("Invalid partyId")
+      throw new NotFoundError(`Invalid partyId ${partyId}`)
     }
 
     party.set("name", body.name)
@@ -923,12 +925,12 @@ class Party {
 
   static async deleteParty(partyId, dm) {
     const partyQuery = new Parse.Query("Party")
-    var party
+    let party
     try {
       party = await partyQuery.get(partyId)
     }
     catch {
-      throw new BadRequestError("Invalid partyId")
+      throw new NotFoundError(`Invalid partyId ${partyId}`)
     }
     const partyDm = party.get("dm")
     if(partyDm.id!=dm.objectId) {
@@ -963,30 +965,30 @@ class Party {
   static async partyRemove(dmId, userId, partyId) {
     const Parties = Parse.Object.extend("Party")
     const partyQuery = new Parse.Query(Parties)
-    var party
+    let party
     try {
       party = await partyQuery.get(partyId)
     }
     catch {
-      throw new NotFoundError("Invalid partyId")
+      throw new NotFoundError(`Invalid partyId ${partyId}`)
     }
     
 
     const playerQuery = new Parse.Query("User")
-    var player
+    let player
     try {
       player = await playerQuery.get(userId)
     }
     catch {
-      throw new NotFoundError("Invalid userId")
+      throw new NotFoundError(`Invalid partyId ${partyId}`)
     }
     const dmQuery = new Parse.Query("User")
-    var dm 
+    let dm 
     try {
       dm = await dmQuery.get(dmId)
     }
     catch {
-      throw new NotFoundError("invalid dmId")
+      throw new NotFoundError(`Invalid dmId ${dmId}`)
     }
     const partyDm = await party.get("dm")
 
@@ -1016,19 +1018,19 @@ class Party {
 
   static async addChat(partyId, body) {
     const partyQuery = new Parse.Query("Party")
-    var party 
+    let party 
     try {
       party = await partyQuery.get(partyId)
     }
     catch {
-      throw new NotFoundError("Invalid partyId")
+      throw new NotFoundError(`Invalid partyId ${partyId}`)
     }
-    var sender;
+    let sender;
     try {
       sender = await User.getUser(body.senderId)
     }
     catch {
-      throw new NotFoundError("Invalid senderId")
+      throw new NotFoundError(`Invalid senderId ${body.senderId}`)
     }
 
     const message = new Parse.Object("Message")
@@ -1061,12 +1063,12 @@ class Party {
   }
 
     const partyQuery = new Parse.Query("Party")
-    var party
+    let party
     try{ 
       party = await partyQuery.get(partyId)
     }
     catch {
-      throw new NotFoundError("Invalid partyId")
+      throw new NotFoundError(`Invalid partyId ${partyId}`)
     }
 
     const messagesLimit = 15;

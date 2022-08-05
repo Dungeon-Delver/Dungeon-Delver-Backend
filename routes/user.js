@@ -1,8 +1,6 @@
 const express = require("express")
-const Party = require("../models/party")
 const router = express.Router()
 const User = require("../models/user")
-const { NotFoundError } = require("../utils/errors")
 
 router.post("/", async (req, res, next) => {
   try {

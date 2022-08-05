@@ -1,7 +1,6 @@
 const express = require("express")
 const router = express.Router()
 const Party = require("../models/party")
-const { NotFoundError, BadRequestError } = require("../utils/errors")
 
 router.post("/create-party", async (req, res, next) => {
     try {
