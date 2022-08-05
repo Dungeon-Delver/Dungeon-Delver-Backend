@@ -81,6 +81,7 @@ class Party {
     const pageLimit = 2;
     let user
     const dmQuery = new Parse.Query("Party");
+    const findPlayerParties = new Parse.Query("Party")
     const playerQuery = new Parse.Query("Party")
 
     if(userId!==undefined) {
@@ -102,8 +103,6 @@ class Party {
     const genreQuery = new Parse.Query("Party")
     const levelQuery = new Parse.Query("Party")
     const statusQuery = new Parse.Query("Party")
-    
-    const findPlayerParties = new Parse.Query("Party")
 
     experienceQuery.equalTo("searchParameters.experience", searchParameters.experience)
     if(searchParameters.hasOwnProperty("type")) {
