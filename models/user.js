@@ -22,9 +22,14 @@ class User {
     dmQuery.descending('createdAt')
     const dmParties = await dmQuery.equalTo("dm", { '__type': 'Pointer', 'className': '_User', 'objectId': userId }).find();
     const dmPartiesRet =  await getMembers(dmParties)
-
-    const userQuery = new Parse.Query("User")
-    const user = await userQuery.get(userId)
+    var user
+    try {
+      const userQuery = new Parse.Query("User")
+      user = await userQuery.get(userId)
+    }
+    catch {
+      throw new NotFoundError("Invalid user id")
+    }
 
     const playerQuery = new Parse.Query(Parties);
     playerQuery.descending('createdAt')
@@ -48,10 +53,23 @@ class User {
   static async requestPartyJoin(userId, partyId) {
     const Parties = Parse.Object.extend("Party")
     const partyQuery = new Parse.Query(Parties)
-    const party = await partyQuery.get(partyId)
+    var party
+    try {
+      party = await partyQuery.get(partyId)
+    }
+    catch {
+      throw new NotFoundError("Invalid partyId")
+    }
+    
 
-    const playerQuery = new Parse.Query("User")
-    const player = await playerQuery.get(userId)
+   var player
+    try {
+      const userQuery = new Parse.Query("User")
+      player = await userQuery.get(userId)
+    }
+    catch {
+      throw new NotFoundError("Invalid userId")
+    }
 
     const notification = new Parse.Object("Notification");
     const dm = party.get("dm")
@@ -76,10 +94,23 @@ class User {
   static async partyLeave(userId, partyId) {
     const Parties = Parse.Object.extend("Party")
     const partyQuery = new Parse.Query(Parties)
-    const party = await partyQuery.get(partyId)
+    var party
+    try {
+      party = await partyQuery.get(partyId)
+    }
+    catch {
+      throw new NotFoundError("Invalid partyId")
+    }
+    
 
-    const playerQuery = new Parse.Query("User")
-    const player = await playerQuery.get(userId)
+    var player
+    try {
+      const playerQuery = new Parse.Query("User")
+      player = await playerQuery.get(userId)
+    }
+    catch {
+      throw new NotFoundError("Invalid userId")
+    }
 
 
     const notification = new Parse.Object("Notification");
@@ -110,10 +141,22 @@ class User {
   static async cancelJoin(userId, partyId) {
     const Parties = Parse.Object.extend("Party")
     const partyQuery = new Parse.Query(Parties)
-    const party = await partyQuery.get(partyId)
+    var party
+    try {
+      party = await partyQuery.get(partyId)
+    }
+    catch {
+      throw new NotFoundError("Invalid partyId")
+    }
 
-    const playerQuery = new Parse.Query("User")
-    const player = await playerQuery.get(userId)
+    var player
+    try {
+      const playerQuery = new Parse.Query("User")
+      player = await playerQuery.get(userId)
+    }
+    catch {
+      throw new NotFoundError("Invalid userId")
+    }
 
     const notificationQuery = new Parse.Query("Notification");
     const dm = party.get("dm")

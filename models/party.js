@@ -21,8 +21,15 @@ class Party {
 
     const newParty = new Parse.Object("Party");
     newParty.set("name", body.name)
-    const query = new Parse.Query("User");
-    const dm = await query.get(body.dm.objectId);
+    var dm
+    try {
+      const query = new Parse.Query("User");
+      dm = await query.get(body.dm.objectId);
+    }
+    catch {
+      throw new NotFoundError("Invalid userId")
+    }
+    
     if(!dm.get("enabled")) {
       console.log("disabled user")
       throw new BadRequestError("Attempting to create party for disabled user")
@@ -53,13 +60,19 @@ class Party {
         return {party: party, requestedUsers: requestedUsers, members: members};
       }
       catch {
-        throw new NotFoundError("This Party Does Not Exist")
+        throw new NotFoundError("Invalid partyId")
       }
   }
 
   static async getRequestedUsers(partyId) {
-    const query = new Parse.Query("Party")
-    const party = await query.get(partyId)
+    var party
+    try {
+      const query = new Parse.Query("Party")
+      party = await query.get(partyId)
+    }
+    catch {
+      throw new NotFoundError("Invalid partyId")
+    }
     const users = await party.get("playersRequested").query().find()
     return users;
   }
@@ -67,18 +80,29 @@ class Party {
   static async handleSearchParty(searchParameters, userId, first, last) {
     
     const pageLimit = 2;
+    var user
+    const dmQuery = new Parse.Query("Party");
+    const playerQuery = new Parse.Query("Party")
 
-    const userQuery = new Parse.Query("User")
-    const user = await userQuery.get(userId)
+    try {
+      const userQuery = new Parse.Query("User")
+      user = await userQuery.get(userId)
+      dmQuery.notEqualTo("dm", { '__type': 'Pointer', 'className': '_User', 'objectId': userId })
+      findPlayerParties.equalTo("players", user)
+      playerQuery.doesNotMatchKeyInQuery("objectId", "objectId", findPlayerParties)
+    }
+    catch {
+      
+    }
+    
 
     const experienceQuery = new Parse.Query("Party");
     const typeQuery = new Parse.Query("Party")
     const genreQuery = new Parse.Query("Party")
     const levelQuery = new Parse.Query("Party")
     const statusQuery = new Parse.Query("Party")
-    const dmQuery = new Parse.Query("Party");
+    
     const findPlayerParties = new Parse.Query("Party")
-    const playerQuery = new Parse.Query("Party")
 
     experienceQuery.equalTo("searchParameters.experience", searchParameters.experience)
     if(searchParameters.hasOwnProperty("type")) {
@@ -91,9 +115,7 @@ class Party {
       levelQuery.equalTo("searchParameters.level", searchParameters.level)
     }
     statusQuery.notEqualTo("status", "Closed")
-    dmQuery.notEqualTo("dm", { '__type': 'Pointer', 'className': '_User', 'objectId': userId })
-    findPlayerParties.equalTo("players", user)
-    playerQuery.doesNotMatchKeyInQuery("objectId", "objectId", findPlayerParties)
+    
 
     const reverseTypeQuery = new Parse.Query("Party")
     reverseTypeQuery.doesNotMatchKeyInQuery("objectId", "objectId", typeQuery)
@@ -871,9 +893,14 @@ class Party {
         throw new BadRequestError("Missing Search Parameters")
       }
     })
-    
-    const partyQuery = new Parse.Query("Party")
-    const party = await partyQuery.get(partyId)
+    var party;
+    try {
+      const partyQuery = new Parse.Query("Party")
+      party = await partyQuery.get(partyId)
+    }
+    catch {
+      throw new NotFoundError("Invalid partyId")
+    }
 
     party.set("name", body.name)
     const userQuery = new Parse.Query("User");
@@ -896,7 +923,13 @@ class Party {
 
   static async deleteParty(partyId, dm) {
     const partyQuery = new Parse.Query("Party")
-    const party = await partyQuery.get(partyId)
+    var party
+    try {
+      party = await partyQuery.get(partyId)
+    }
+    catch {
+      throw new BadRequestError("Invalid partyId")
+    }
     const partyDm = party.get("dm")
     if(partyDm.id!=dm.objectId) {
       throw new BadRequestError("Only the Dungeon Master can delete parties")
@@ -930,12 +963,31 @@ class Party {
   static async partyRemove(dmId, userId, partyId) {
     const Parties = Parse.Object.extend("Party")
     const partyQuery = new Parse.Query(Parties)
-    const party = await partyQuery.get(partyId)
+    var party
+    try {
+      party = await partyQuery.get(partyId)
+    }
+    catch {
+      throw new NotFoundError("Invalid partyId")
+    }
+    
 
     const playerQuery = new Parse.Query("User")
-    const player = await playerQuery.get(userId)
+    var player
+    try {
+      player = await playerQuery.get(userId)
+    }
+    catch {
+      throw new NotFoundError("Invalid userId")
+    }
     const dmQuery = new Parse.Query("User")
-    const dm = await dmQuery.get(dmId)
+    var dm 
+    try {
+      dm = await dmQuery.get(dmId)
+    }
+    catch {
+      throw new NotFoundError("invalid dmId")
+    }
     const partyDm = await party.get("dm")
 
     if(dm.objectId !== partyDm.objectId) {
@@ -964,9 +1016,20 @@ class Party {
 
   static async addChat(partyId, body) {
     const partyQuery = new Parse.Query("Party")
-    const party = await partyQuery.get(partyId)
-
-    const sender = await User.getUser(body.senderId)
+    var party 
+    try {
+      party = await partyQuery.get(partyId)
+    }
+    catch {
+      throw new NotFoundError("Invalid partyId")
+    }
+    var sender;
+    try {
+      sender = await User.getUser(body.senderId)
+    }
+    catch {
+      throw new NotFoundError("Invalid senderId")
+    }
 
     const message = new Parse.Object("Message")
     message.set("user", sender)
@@ -998,7 +1061,13 @@ class Party {
   }
 
     const partyQuery = new Parse.Query("Party")
-    const party = await partyQuery.get(partyId)
+    var party
+    try{ 
+      party = await partyQuery.get(partyId)
+    }
+    catch {
+      throw new NotFoundError("Invalid partyId")
+    }
 
     const messagesLimit = 15;
 
