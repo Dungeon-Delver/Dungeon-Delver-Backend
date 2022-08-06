@@ -743,8 +743,12 @@ class Party {
     const dmQuery = new Parse.Query("Party");
     const findPlayerParties = new Parse.Query("Party")
     const playerQuery = new Parse.Query("Party")
-    const firstQuery = new Parse.Query("Party")
-    const lastQuery = new Parse.Query("Party")
+    const firstQueryLess = new Parse.Query("Party")
+    const firstQueryEqual = new Parse.Query("Party")
+    const lastQueryGreater = new Parse.Query("Party")
+    const lastQueryEqualName = new Parse.Query("Party")
+    const lastQueryEqualDate = new Parse.Query("Party")
+    let lastQueryEqual = new Parse.Query("Party")
 
     statusQuery.notEqualTo("status", "Closed")
     dmQuery.notEqualTo("dm", { '__type': 'Pointer', 'className': '_User', 'objectId': userId })
@@ -753,19 +757,32 @@ class Party {
     nameQuery.startsWith("name", partyName)
     
     if(first!==null) {
-      firstQuery.lessThan("name", first.name)
+      firstQueryLess.lessThan("name", first.name)
+      firstQueryEqual.equalTo("name", first.name)
+      const getFirstQuery = new Parse.Query("Party")
+      const firstParty = await getFirstQuery.get(first.objectId)
+      firstQueryEqual.greaterThan("createdAt", firstParty.get("createdAt"))
     }
     if(last!==null) {
-      lastQuery.greaterThan("name", last.name)
+      lastQueryGreater.greaterThan("name", last.name)
+      lastQueryEqualName.equalTo("name", last.name)
+      const getLastQuery = new Parse.Query("Party")
+      const lastParty = await getLastQuery.get(last.objectId)
+      lastQueryEqualDate.lessThan("createdAt", lastParty.get("createdAt"))
+      lastQueryEqual = Parse.Query.and(lastQueryEqualName, lastQueryEqualDate)
     }
+    const firstQuery = Parse.Query.or(firstQueryLess, firstQueryEqual)
+    const lastQuery = Parse.Query.or(lastQueryGreater, lastQueryEqual)
 
     const query = Parse.Query.and(nameQuery, statusQuery, dmQuery, playerQuery, firstQuery, lastQuery)
     query.limit(pageLimit+1);
     if(ascending) {
       query.ascending("name")
+      query.addDescending('createdAt')
     }
     else {
       query.descending("name")
+      query.addAscending('createdAt')
     }
     const parties = await query.find();
 
@@ -774,6 +791,7 @@ class Party {
     })
 
     let reachedEnd = false;
+
     if(partiesObjects.length<=pageLimit) {
       reachedEnd = true;
     }
