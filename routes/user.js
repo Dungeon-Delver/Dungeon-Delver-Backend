@@ -77,18 +77,6 @@ router.post("/:partyId/cancel-join", async (req, res, next) => {
   }
 })
 
-router.post("/:userId/disable", async (req, res, next) => {
-  try {
-    const userId = req.params.userId
-    //await Party.listParties(userId);
-    res.status(204);
-  }
-  catch(err) {
-    console.log(err)
-    next(err)
-  }
-})
-
 
 router.get("/:userId/in/party/:partyId", async (req, res, next) => {
   try {
