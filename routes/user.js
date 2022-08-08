@@ -2,17 +2,6 @@ const express = require("express")
 const router = express.Router()
 const User = require("../models/user")
 
-router.post("/", async (req, res, next) => {
-  try {
-    const body = req.body;
-    const newUser = await User.handleFacebookLogin(body)
-    res.status(201).json({ newUser: newUser })
-  } catch (err) {
-    console.log(err)
-    next(err)
-  }
-})
-
 router.get("/:userId/", async (req, res, next) => {
   try {
     const userId = req.params.userId
