@@ -1,3 +1,5 @@
 # dependencies
 /node_modules
 /keys.json
+.prettierignore
+.prettierrc.json
