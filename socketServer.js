@@ -1,7 +1,8 @@
 const axios = require("axios");
 const { BACKEND_URL } = require("./constants.js");
-const app = require("http").createServer();
-const io = require("socket.io")(app, {
+
+module.exports = function (server) {
+  const io = require("socket.io")(server, {
   cors: {
     origin: "*",
   },
@@ -40,5 +41,4 @@ io.on("connect", (socket) => {
     socket.leave(roomId);
   });
 });
-
-module.exports = app;
+}
