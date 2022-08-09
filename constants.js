@@ -1,6 +1,6 @@
-const BACKEND_URL = "http://localhost:3001/";
+const BACKEND_URL = "https://murmuring-taiga-17326.herokuapp.com/";
 
-const SOCKET_SERVER_URL = "http://localhost:3002/";
+const SOCKET_SERVER_URL = "https://murmuring-taiga-17326.herokuapp.com/";
 
 module.exports = {
   BACKEND_URL,
