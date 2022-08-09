@@ -225,8 +225,7 @@ class User {
         } catch {
           object.sourceUser = {
             username: "/Deleted User/",
-            picture:
-              "https://static.thenounproject.com/png/994628-200.png",
+            picture: "https://static.thenounproject.com/png/994628-200.png",
           };
         }
       }
@@ -362,12 +361,11 @@ class User {
     });
     findPlayerParties.equalTo("players", user);
     const dmParties = await dmQuery.find();
-    console.log('dmParties: ', dmParties);
     const playerParties = await findPlayerParties.find();
-   for(let i = 0; i < dmParties.length; i++) {
+    for (let i = 0; i < dmParties.length; i++) {
       await deleteParty(dmParties[i].id, user.toJSON());
     }
-    for(let j = 0; j < playerParties.length; j++) {
+    for (let j = 0; j < playerParties.length; j++) {
       let playersRelation = playerParties[j].relation("players");
       playersRelation.remove(user);
       await playerParties[j].save();
