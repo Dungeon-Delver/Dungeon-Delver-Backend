@@ -107,4 +107,15 @@ router.get("/:userId/profile", async (req, res, next) => {
   }
 });
 
+router.post("/:userId/delete", async (req, res, next) => {
+  try {
+    const userId = req.params.userId;
+    const data = await User.deleteUser(userId);
+    res.status(201).json({ data });
+  } catch (err) {
+    console.log(err);
+    next(err);
+  }
+});
+
 module.exports = router;

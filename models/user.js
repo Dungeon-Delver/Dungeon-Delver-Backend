@@ -1,6 +1,6 @@
-const { BadRequestError, NotFoundError } = require("../utils/errors");
+const { NotFoundError } = require("../utils/errors");
 const Parse = require("../utils/initializeParse");
-const Party = require("./party");
+const { deleteParty, partyRemove } = require("./party");
 
 class User {
   static async listParties(userId) {
@@ -224,9 +224,9 @@ class User {
           object.sourceUser = sourceUser.toJSON();
         } catch {
           object.sourceUser = {
-            user: "/Deleted User/",
+            username: "/Deleted User/",
             picture:
-              "https://www.personality-insights.com/wp-content/uploads/2017/12/default-profile-pic-e1513291410505.jpg",
+              "https://static.thenounproject.com/png/994628-200.png",
           };
         }
       }
@@ -344,6 +344,36 @@ class User {
       user: userJSON,
       parties: { dmParties: dmPartiesRet, playerParties: playerPartiesRet },
     };
+  }
+  static async deleteUser(userId) {
+    const userQuery = new Parse.Query("User");
+    let user;
+    try {
+      user = await userQuery.get(userId);
+    } catch {
+      throw new NotFoundError(`Invalid userId ${userId}`);
+    }
+    const dmQuery = new Parse.Query("Party");
+    const findPlayerParties = new Parse.Query("Party");
+    dmQuery.equalTo("dm", {
+      __type: "Pointer",
+      className: "_User",
+      objectId: userId,
+    });
+    findPlayerParties.equalTo("players", user);
+    const dmParties = await dmQuery.find();
+    console.log('dmParties: ', dmParties);
+    const playerParties = await findPlayerParties.find();
+   for(let i = 0; i < dmParties.length; i++) {
+      await deleteParty(dmParties[i].id, user.toJSON());
+    }
+    for(let j = 0; j < playerParties.length; j++) {
+      let playersRelation = playerParties[j].relation("players");
+      playersRelation.remove(user);
+      await playerParties[j].save();
+    }
+    const result = await user.destroy({ useMasterKey: true });
+    return result;
   }
 }
 
