@@ -2,5 +2,5 @@
 /node_modules
 .prettierignore
 .prettierrc.json
-keys.json
-Procfile
+./keys.json
+./Procfile
