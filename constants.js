@@ -1,6 +1,6 @@
-const BACKEND_URL = "https://murmuring-taiga-17326.herokuapp.com/";
+const BACKEND_URL = "https://zircon-grandiose-individual.glitch.me/";
 
-const SOCKET_SERVER_URL = "https://murmuring-taiga-17326.herokuapp.com/";
+const SOCKET_SERVER_URL = "https://zircon-grandiose-individual.glitch.me";
 
 module.exports = {
   BACKEND_URL,
