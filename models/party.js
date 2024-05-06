@@ -707,12 +707,12 @@ class Party {
           const messageUser = await userQuery.get(userId);
           const message = item.get("message");
           const date = item.get("createdAt");
-          const name = messageUser.get("username");
+          const name = messageUser.get("name");
           const picture = messageUser.get("picture");
           return {
             objectId: item.id,
             senderId: userId,
-            user: { username: name, picture: picture },
+            user: { name: name, picture: picture },
             createdAt: date,
             body: message,
             ownedByCurrentUser: body.userId === userId,
